@@ -9,7 +9,7 @@ async function init() {
     server.route(require('./root'));
 
     await server.start();
-    console.log('Server started')
+    console.log('Server started');
 }
 
 init()
