@@ -9,10 +9,19 @@ function getMongoURL() {
     return url;
 }
 
+async function createShipmentEventIndexes(mongoClient) {
+    const collection = mongoClient
+        .db('shipment')
+        .collection('shipment_events');
+
+    await collection.createIndex('shipmentId');
+}
+
 module.exports = async function setupMongo() {
     const client = await MongoClient.connect(getMongoURL(), {
         useNewUrlParser: true
     });
 
+    await createShipmentEventIndexes(client);
     return client;
 };
