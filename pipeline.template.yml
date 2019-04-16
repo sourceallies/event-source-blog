@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Pipeline for building the event-source-blog example
 Parameters:
-  RepoToken:
+  GithubAccessToken:
     Type: String
     NoEcho: true
     Description: OAuth Token for the github repository
