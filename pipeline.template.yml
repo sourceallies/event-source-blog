@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Pipeline for node-reference
+Description: Pipeline for building the event-source-blog example
 Parameters:
   RepoToken:
     Type: String
