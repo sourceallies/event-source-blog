@@ -46,8 +46,6 @@ Resources:
       ServiceRole: !GetAtt PipelineRole.Arn
       Source:
         Type: CODEPIPELINE
-        BuildSpec: |
-          docker build .
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
