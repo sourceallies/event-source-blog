@@ -51,6 +51,7 @@ Resources:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:1.0
+        PrivilegedMode: true
       Artifacts:
         Type: CODEPIPELINE
   Pipeline:
