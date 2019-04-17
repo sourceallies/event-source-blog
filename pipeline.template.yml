@@ -22,6 +22,7 @@ Resources:
               Service: "codepipeline.amazonaws.com"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
+        - "arn:aws:iam::aws:policy/AdministratorAccess"
   ArtifactStorage:
     Type: "AWS::S3::Bucket"
   ArtifactStoragePolicy:
