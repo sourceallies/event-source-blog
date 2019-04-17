@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/sourceallies/event-source-blog#readme",
   "dependencies": {
-    "hapi": "^18.1.0"
+    "dotenv-flow": "^0.3.0",
+    "hapi": "^18.1.0",
+    "mongodb": "^3.2.3"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
