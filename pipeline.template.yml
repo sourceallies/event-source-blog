@@ -50,8 +50,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:1.0
-        PrivilegedMode: true
+        Image: aws/codebuild/docker:1.12.1
       Artifacts:
         Type: CODEPIPELINE
   Pipeline:
