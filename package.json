@@ -22,10 +22,15 @@
   "dependencies": {
     "dotenv-flow": "^0.3.0",
     "hapi": "^18.1.0",
+    "joi": "^14.3.1",
     "mongodb": "^3.2.3"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
-    "jest": "^24.7.1"
+    "jest": "^24.7.1",
+    "mockdate": "^2.0.2"
+  },
+  "jest": {
+    "clearMocks": true
   }
 }

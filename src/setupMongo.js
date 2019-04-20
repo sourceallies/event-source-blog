@@ -9,19 +9,21 @@ function getMongoURL() {
     return url;
 }
 
-async function createShipmentEventIndexes(mongoClient) {
+async function setupShipmentEventsCollection(mongoClient) {
     const collection = mongoClient
         .db('shipment')
         .collection('shipment_events');
 
     await collection.createIndex('shipmentId');
+    return collection;
 }
 
-module.exports = async function setupMongo() {
+module.exports = async function setupMongo(server) {
     const client = await MongoClient.connect(getMongoURL(), {
         useNewUrlParser: true
     });
 
-    await createShipmentEventIndexes(client);
+    server.app.mongoClient = client;
+    server.app.shipmentEventsCollection = await setupShipmentEventsCollection(client);
     return client;
 };

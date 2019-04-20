@@ -13,10 +13,10 @@ async function init() {
         port: process.env.PORT || 3000
     });
     server.events.on('request', logRequestEvent);
-    server.app.mongoClient = await setupMongo();
+    await setupMongo(server);
 
     server.route(require('./root'));
-    server.route(require('./shipments/events/create-shipment/postShipment'));
+    server.route(require('./shipments/events/create/postShipment'));
 
     await server.start();
     console.log('Server started');
