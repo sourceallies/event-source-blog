@@ -16,8 +16,15 @@ function buildEventToSave({payload, params}) {
 async function handler(request, h) {
     const event = buildEventToSave(request);
 
-    const {shipmentEventsCollection} = request.server.app;
-    await shipmentEventsCollection.insertOne(event);
+    // const {shipmentEventsCollection} = request.server.app;
+    // await shipmentEventsCollection.insertOne(event);
+
+    await request.server.app.producer.send({
+        topic: 'shipment-events',
+        messages: [
+            { key: event.shipmentId, value: JSON.stringify(event) }
+        ]
+    });
 
     request.log(['info'], {event});
     return h.response().code(202);

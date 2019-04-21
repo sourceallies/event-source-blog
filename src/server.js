@@ -26,6 +26,7 @@ async function init() {
     });
     server.events.on('request', logRequestEvent);
     await setupMongo(server);
+    await require('./setupKafka')(server);
 
     server.route(require('./root'));
     server.route(require('./shipments/events/create/postShipment'));
