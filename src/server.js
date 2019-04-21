@@ -27,6 +27,7 @@ async function init() {
     server.events.on('request', logRequestEvent);
     await setupMongo(server);
     await require('./setupKafka')(server);
+    await require('./shipments/events/setupSaveEventListener')(server);
 
     server.route(require('./root'));
     server.route(require('./shipments/events/create/postShipment'));
@@ -36,4 +37,7 @@ async function init() {
 }
 
 init()
-    .catch(e => console.error(e));
+    .catch(e => {
+        console.error(e);
+        process.exit(1);
+    });
