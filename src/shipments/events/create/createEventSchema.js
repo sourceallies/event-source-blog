@@ -1,22 +1,23 @@
 const Joi = require('joi');
 
+const address = Joi.object({
+    name: Joi.string(),
+    line1: Joi.string(),
+    line2: Joi.string().optional(),
+    city: Joi.string(),
+    state: Joi.string().length(2),
+    zip: Joi.string().length(5)
+}).options({
+    presence: 'required',
+    abortEarly: false
+});
+
 module.exports = Joi.object({
-    shipFrom: Joi.object({
-        name: Joi.string().required(),
-        line1: Joi.string().required(),
-        line2: Joi.string(),
-        city: Joi.string().required(),
-        state: Joi.string().length(2).required(),
-        zip: Joi.string().length(5)
-    }).required(),
-    shipTo: Joi.object({
-        name: Joi.string().required(),
-        line1: Joi.string().required(),
-        line2: Joi.string(),
-        city: Joi.string().required(),
-        state: Joi.string().length(2).required(),
-        zip: Joi.string().length(5)
-    }).required(),
+    shipFrom: address,
+    shipTo: address,
     weightInPounds: Joi.number()
         .min(1)
+}).options({
+    presence: 'required',
+    abortEarly: false
 });

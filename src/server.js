@@ -8,12 +8,11 @@ function logRequestEvent(_request, {tags, data}) {
     console.log(tags, data);
 }
 
-// WIP
-// async function failAction(request, h, err) {
-//     return h.response(err.details || err)
-//         .code(400)
-//         .takeover;
-// }
+async function failAction(request, h, err) {
+    err.output.payload = err.details
+        .map(({path, message}) => ({path, message}));
+    throw err;
+}
 
 async function init() {
     const server = new Server({
@@ -21,7 +20,7 @@ async function init() {
         routes: {
             cors: true,
             validate: {
-                // failAction
+                failAction
             }
         }
     });
