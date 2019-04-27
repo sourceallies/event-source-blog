@@ -4,6 +4,7 @@ module.exports = function createEventReducer(_, createEvent) {
     return {
         _id: shipmentId,
         createdTimestamp: eventTimestamp,
+        status: 'Submitted',
         shipFrom,
         shipTo,
         weightInPounds

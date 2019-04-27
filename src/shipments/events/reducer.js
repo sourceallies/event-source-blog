@@ -1,6 +1,7 @@
 
 const reducersByEventType = {
-    create: require('./create/createEventReducer')
+    create: require('./create/createEventReducer'),
+    assign: require('./assign/assignEventReducer')
 };
 
 module.exports = function shipmentEventReducer(shipment, event) {
