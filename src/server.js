@@ -28,6 +28,7 @@ async function init() {
     await setupMongo(server);
 
     server.route(require('./root'));
+    server.route(require('./shipments/getShipmentById'));
     server.route(require('./shipments/events/create/postShipment'));
 
     await server.start();
