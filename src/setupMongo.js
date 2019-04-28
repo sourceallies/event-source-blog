@@ -15,6 +15,9 @@ async function setupShipmentEventsCollection(mongoClient) {
         .collection('shipment_events');
 
     await collection.createIndex('shipmentId');
+
+    const changeStream = collection.watch([], {fullDocument: 'updateLookup'});
+    changeStream.on('change', require('./shipments/events/onChange'));
     return collection;
 }
 
