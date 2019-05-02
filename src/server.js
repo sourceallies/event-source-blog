@@ -29,6 +29,7 @@ async function init() {
 
     server.route(require('./root'));
     server.route(require('./shipments/events/create/postShipment'));
+    server.route(require('./shipments/events/assign/assignShipment'));
     server.route(require('./shipments/events/shipped/shippedEventHandler'));
 
     await server.start();
