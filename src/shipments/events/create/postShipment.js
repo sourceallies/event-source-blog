@@ -1,6 +1,6 @@
 const createEventSchema = require('./createEventSchema');
 
-function buildEventToSave({payload, params}) {
+function buildEventToSend({payload, params}) {
     const shipmentId = params.shipmentId;
     const eventTimestamp = new Date(Date.now()).toISOString();
 
@@ -14,10 +14,7 @@ function buildEventToSave({payload, params}) {
 }
 
 async function handler(request, h) {
-    const event = buildEventToSave(request);
-
-    // const {shipmentEventsCollection} = request.server.app;
-    // await shipmentEventsCollection.insertOne(event);
+    const event = buildEventToSend(request);
 
     await request.server.app.producer.send({
         topic: 'shipment-events',

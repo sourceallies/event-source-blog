@@ -13,7 +13,7 @@ module.exports = async function setupSaveEventListener(server) {
         eachMessage: async ({ message }) => {
             const event = JSON.parse(message.value);
             console.log('Got event: ', event);
-            await shipmentEventsCollection.insertOne(event);
+            await shipmentEventsCollection.replaceOne({_id: event._id}, event, {upsert: true});
         }
     });
 };
