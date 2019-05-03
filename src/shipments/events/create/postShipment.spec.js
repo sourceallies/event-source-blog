@@ -1,8 +1,8 @@
 
 const {Server} = require('hapi');
 const MockDate = require('mockdate');
-const mockShipmentEventsCollection = {
-    insertOne: jest.fn()
+const mockProducer = {
+    send: jest.fn()
 };
 jest.mock('./createEventSchema', () => {
     return {
@@ -15,13 +15,14 @@ const createEventSchema = require('./createEventSchema');
 describe('Post shipment', () => {
     let server;
     let request;
+
     beforeEach(() => {
         createEventSchema._validateWithOptions.mockImplementation((value) => value);
 
         server = new Server();
         server.route(require('./postShipment'));
-        mockShipmentEventsCollection.insertOne.mockResolvedValue();
-        server.app.shipmentEventsCollection = mockShipmentEventsCollection;
+        mockProducer.send.mockResolvedValue();
+        server.app.producer = mockProducer;
 
         request = {
             url: '/shipments/ship1234/events/create',
@@ -47,14 +48,26 @@ describe('Post shipment', () => {
             expect(response.statusCode).toEqual(202);
         });
 
-        it('should save a create event', () => {
-            expect(mockShipmentEventsCollection.insertOne).toHaveBeenCalledWith(expect.objectContaining({
+        it('should send a create event to the shipment-events topic', () => {
+            const body = JSON.parse(mockProducer.send.mock.calls[0][0].messages[0].value);
+            expect(body).toEqual(expect.objectContaining({
                 _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
                 eventTimestamp: '2019-03-04T02:30:45.000Z',
                 eventType: 'create',
                 weightInPounds: 20
             }));
+        });
+
+        it('should send the event to the shipment-events topic', () => {
+            expect(mockProducer.send).toHaveBeenCalledWith(expect.objectContaining({
+                topic: 'shipment-events'
+            }));
+        });
+
+        it('should partition the message by shipmentId', () => {
+            const key = mockProducer.send.mock.calls[0][0].messages[0].key;
+            expect(key).toEqual('ship1234');
         });
     });
 
@@ -71,8 +84,8 @@ describe('Post shipment', () => {
             expect(response.statusCode).toEqual(400);
         });
 
-        it('should not save the event', () => {
-            expect(mockShipmentEventsCollection.insertOne).not.toHaveBeenCalled();
+        it('should not send the event', () => {
+            expect(mockProducer.send).not.toHaveBeenCalled();
         });
     });
 });

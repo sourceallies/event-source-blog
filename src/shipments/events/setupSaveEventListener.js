@@ -1,7 +1,7 @@
 
 
 module.exports = async function setupSaveEventListener(server) {
-    const consumer = server.app.kafka.consumer({ groupId: 'test-group' });
+    const consumer = server.app.kafka.consumer({ groupId: 'shipment-events-persist' });
     await consumer.connect();
     await consumer.subscribe({ topic: 'shipment-events' });
 
