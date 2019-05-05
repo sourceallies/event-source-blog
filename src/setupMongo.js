@@ -18,6 +18,14 @@ async function setupShipmentEventsCollection(mongoClient) {
     return collection;
 }
 
+async function setupShipmentCollection(mongoClient) {
+    const collection = mongoClient
+        .db('shipment')
+        .collection('shipments');
+
+    return collection;
+}
+
 module.exports = async function setupMongo(server) {
     const client = await MongoClient.connect(getMongoURL(), {
         useNewUrlParser: true
@@ -25,5 +33,6 @@ module.exports = async function setupMongo(server) {
 
     server.app.mongoClient = client;
     server.app.shipmentEventsCollection = await setupShipmentEventsCollection(client);
+    server.app.shipmentCollection = await setupShipmentCollection(client);
     return client;
 };

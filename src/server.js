@@ -28,6 +28,7 @@ async function init() {
     await setupMongo(server);
     await require('./setupKafka')(server);
     await require('./shipments/events/setupSaveEventListener')(server);
+    await require('./shipments/setupShipmentEventListener')(server);
 
     server.route(require('./root'));
     server.route(require('./shipments/getShipmentById'));
