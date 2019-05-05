@@ -30,6 +30,8 @@ async function init() {
     await require('./shipments/events/setupSaveEventListener')(server);
 
     server.route(require('./root'));
+    server.route(require('./shipments/getShipmentById'));
+    server.route(require('./shipments/events/listEvents'));
     server.route(require('./shipments/events/create/postShipment'));
     server.route(require('./shipments/events/assign/assignShipment'));
     server.route(require('./shipments/events/shipped/shippedEventHandler'));
