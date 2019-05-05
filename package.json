@@ -29,7 +29,8 @@
   "devDependencies": {
     "eslint": "^5.16.0",
     "jest": "^24.7.1",
-    "mockdate": "^2.0.2"
+    "mockdate": "^2.0.2",
+    "node-fetch": "^2.5.0"
   },
   "jest": {
     "clearMocks": true
