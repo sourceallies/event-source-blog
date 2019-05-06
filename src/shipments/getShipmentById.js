@@ -1,7 +1,9 @@
+const mongoClient = require('../configuredMongoClient');
+
 async function handler(request, h) {
     const _id = request.params.shipmentId;
 
-    const shipment = await request.server.app.mongoClient
+    const shipment = await mongoClient
         .db('shipment')
         .collection('shipments')
         .findOne({_id});

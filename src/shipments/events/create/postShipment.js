@@ -1,4 +1,5 @@
 const createEventSchema = require('./createEventSchema');
+const publishEvent = require('../publishEvent');
 
 function buildEventToSend({payload, params}) {
     const shipmentId = params.shipmentId;
@@ -15,14 +16,7 @@ function buildEventToSend({payload, params}) {
 
 async function handler(request, h) {
     const event = buildEventToSend(request);
-
-    await request.server.app.producer.send({
-        topic: 'shipment-events',
-        messages: [
-            { key: event.shipmentId, value: JSON.stringify(event) }
-        ]
-    });
-
+    await publishEvent(event);
     request.log(['info'], {event});
     return h.response().code(202);
 }

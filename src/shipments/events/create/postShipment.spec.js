@@ -1,9 +1,10 @@
 
 const {Server} = require('hapi');
 const MockDate = require('mockdate');
-const mockProducer = {
-    send: jest.fn()
-};
+
+jest.mock('../publishEvent', () => jest.fn());
+const publishEvent = require('../publishEvent');
+
 jest.mock('./createEventSchema', () => {
     return {
         _validateWithOptions: jest.fn(),
@@ -21,8 +22,7 @@ describe('Post shipment', () => {
 
         server = new Server();
         server.route(require('./postShipment'));
-        mockProducer.send.mockResolvedValue();
-        server.app.producer = mockProducer;
+        publishEvent.mockResolvedValue();
 
         request = {
             url: '/shipments/ship1234/events/create',
@@ -49,25 +49,13 @@ describe('Post shipment', () => {
         });
 
         it('should send a create event to the shipment-events topic', () => {
-            const body = JSON.parse(mockProducer.send.mock.calls[0][0].messages[0].value);
-            expect(body).toEqual(expect.objectContaining({
+            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
                 _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
                 eventTimestamp: '2019-03-04T02:30:45.000Z',
                 eventType: 'create',
                 weightInPounds: 20
             }));
-        });
-
-        it('should send the event to the shipment-events topic', () => {
-            expect(mockProducer.send).toHaveBeenCalledWith(expect.objectContaining({
-                topic: 'shipment-events'
-            }));
-        });
-
-        it('should partition the message by shipmentId', () => {
-            const key = mockProducer.send.mock.calls[0][0].messages[0].key;
-            expect(key).toEqual('ship1234');
         });
     });
 
@@ -85,7 +73,7 @@ describe('Post shipment', () => {
         });
 
         it('should not send the event', () => {
-            expect(mockProducer.send).not.toHaveBeenCalled();
+            expect(publishEvent).not.toHaveBeenCalled();
         });
     });
 });
