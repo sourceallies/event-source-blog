@@ -6,8 +6,10 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
+const consumer = kafka.consumer.bind(kafka);
 
 module.exports = {
     kafka,
+    consumer,
     producer
 };

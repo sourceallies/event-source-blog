@@ -7,7 +7,8 @@
     "start": "node src/server.js",
     "test": "jest",
     "lint": "eslint src",
-    "verify": "jest && npm run lint"
+    "verify": "jest && npm run lint",
+    "acceptance": "jest --testMatch '**/*.at.js'"
   },
   "repository": {
     "type": "git",
@@ -28,9 +29,11 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
+    "jasmine-fail-fast": "^2.0.0",
     "jest": "^24.7.1",
     "mockdate": "^2.0.2",
-    "node-fetch": "^2.5.0"
+    "node-fetch": "^2.5.0",
+    "shortid": "^2.2.14"
   },
   "jest": {
     "clearMocks": true
