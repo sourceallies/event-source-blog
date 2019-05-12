@@ -1,12 +1,7 @@
-const mongoClient = require('../configuredMongoClient');
+const loadShipment = require('./loadShipment');
 
 async function handler(request, h) {
-    const _id = request.params.shipmentId;
-
-    const shipment = await mongoClient
-        .db('shipment')
-        .collection('shipments')
-        .findOne({_id});
+    const shipment = await loadShipment(request.params.shipmentId);
 
     if (!shipment) {
         return h.response().code(404);
