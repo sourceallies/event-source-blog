@@ -1,4 +1,5 @@
 const assignEventSchema = require('./assignEventSchema');
+const publishEvent = require('../publishEvent');
 
 function buildEventToSave({payload, params}) {
     const shipmentId = params.shipmentId;
@@ -15,10 +16,7 @@ function buildEventToSave({payload, params}) {
 
 async function handler(request, h) {
     const event = buildEventToSave(request);
-
-    const {shipmentEventsCollection} = request.server.app;
-    await shipmentEventsCollection.insertOne(event);
-
+    await publishEvent(event);
     request.log(['info'], {event});
     return h.response().code(202);
 }

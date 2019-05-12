@@ -2,7 +2,8 @@
 require('dotenv-flow').config();
 
 const {Server} = require('hapi');
-const setupMongo = require('./setupMongo');
+const mongoClient = require('./configuredMongoClient');
+const configuredKafka = require('./configuredKafka');
 
 function logRequestEvent(_request, {tags, data}) {
     console.log(tags, data);
@@ -25,7 +26,16 @@ async function init() {
         }
     });
     server.events.on('request', logRequestEvent);
-    await setupMongo(server);
+    await mongoClient.connect();
+    //TODO: move somewhere
+    await mongoClient
+        .db('shipment')
+        .collection('shipment_events')
+        .createIndex('shipmentId');
+
+    await configuredKafka.producer.connect();
+    await require('./shipments/events/setupSaveEventListener')();
+    await require('./shipments/setupShipmentEventListener')();
 
     server.route(require('./root'));
     server.route(require('./shipments/getShipmentById'));
@@ -39,4 +49,7 @@ async function init() {
 }
 
 init()
-    .catch(e => console.error(e));
+    .catch(e => {
+        console.error(e);
+        process.exit(1);
+    });

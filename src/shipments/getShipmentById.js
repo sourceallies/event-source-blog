@@ -1,15 +1,16 @@
-const shipmentEventsReducer = require('./events/reducer');
+const mongoClient = require('../configuredMongoClient');
 
 async function handler(request, h) {
-    const shipmentId = request.params.shipmentId;
+    const _id = request.params.shipmentId;
 
-    const {shipmentEventsCollection} = request.server.app;
-    const events = await shipmentEventsCollection
-        .find({shipmentId})
-        .sort([['eventTimestamp', 1]])
-        .toArray();
+    const shipment = await mongoClient
+        .db('shipment')
+        .collection('shipments')
+        .findOne({_id});
 
-    const shipment = events.reduce(shipmentEventsReducer, {});
+    if (!shipment) {
+        return h.response().code(404);
+    }
 
     return h.response(shipment);
 }
