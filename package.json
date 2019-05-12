@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/sourceallies/event-source-blog#readme",
   "dependencies": {
+    "boom": "^7.3.0",
     "dotenv-flow": "^0.3.0",
     "hapi": "^18.1.0",
     "joi": "^14.3.1",
