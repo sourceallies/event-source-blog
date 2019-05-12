@@ -1,4 +1,5 @@
 
+const IllegalShipmentStateError = require('../IllegalShipmentStateError');
 const assignEventReducer = require('./assignEventReducer');
 
 describe('assign event reducer', () => {
@@ -18,10 +19,11 @@ describe('assign event reducer', () => {
         };
     });
 
-    describe('happy path', () => {
+    describe.each(['Submitted', 'Assigned'])('shipment is in %p status', (status) => {
         let resultingShipment;
 
         beforeEach(() => {
+            shipment.status = status;
             resultingShipment = assignEventReducer(shipment, event);
         });
 
@@ -31,6 +33,22 @@ describe('assign event reducer', () => {
 
         it('should set assignedToTruck to the truckId ', () => {
             expect(resultingShipment.assignedToTruck).toEqual('56');
+        });
+    });
+
+    describe('shipment does not exist', () => {
+        it('should throw an error', () => {
+            expect(() => assignEventReducer(undefined, event)).toThrow(IllegalShipmentStateError);
+        });
+    });
+
+    describe('shipment has already been shipped', () => {
+        beforeEach(() => {
+            shipment.status = 'Shipped';
+        });
+
+        it('should throw an error', () => {
+            expect(() => assignEventReducer(shipment, event)).toThrow(IllegalShipmentStateError);
         });
     });
 });
