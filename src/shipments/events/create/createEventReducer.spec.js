@@ -1,4 +1,5 @@
 
+const IllegalShipmentStateError = require('../IllegalShipmentStateError');
 const createEventReducer = require('./createEventReducer');
 
 describe('create event reducer', () => {
@@ -57,6 +58,12 @@ describe('create event reducer', () => {
 
         it('should copy over the weightInPounds', () => {
             expect(resultingShipment.weightInPounds).toEqual(10);
+        });
+    });
+
+    describe('shipment already exists', () => {
+        it('should throw an error', () => {
+            expect(() => createEventReducer({}, event)).toThrow(IllegalShipmentStateError);
         });
     });
 });
