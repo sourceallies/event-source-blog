@@ -2,6 +2,7 @@ const createEventSchema = require('./createEventSchema');
 const publishEvent = require('../publishEvent');
 const loadShipment = require('../../loadShipment');
 const createEventReducer = require('./createEventReducer');
+const calculateCost = require('./calculateCost');
 
 function buildEventToSend({payload, params}) {
     const shipmentId = params.shipmentId;
@@ -12,7 +13,8 @@ function buildEventToSend({payload, params}) {
         _id: `${shipmentId}-${eventTimestamp}`,
         shipmentId,
         eventTimestamp,
-        eventType: 'create'
+        eventType: 'create',
+        cost: calculateCost(payload)
     };
 }
 
