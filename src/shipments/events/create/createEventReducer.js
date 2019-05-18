@@ -1,7 +1,7 @@
 const IllegalShipmentStateError = require('../IllegalShipmentStateError');
 
 module.exports = function createEventReducer(shipment, createEvent) {
-    const {shipmentId, eventTimestamp, shipFrom, shipTo, weightInPounds} = createEvent;
+    const {shipmentId, eventTimestamp, shipFrom, shipTo, weightInPounds, cost} = createEvent;
     if (shipment) {
         throw new IllegalShipmentStateError(`Shipment with id ${shipmentId} already exists`);
     }
@@ -12,6 +12,7 @@ module.exports = function createEventReducer(shipment, createEvent) {
         status: 'Submitted',
         shipFrom,
         shipTo,
-        weightInPounds
+        weightInPounds,
+        cost
     };
 };

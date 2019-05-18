@@ -25,7 +25,8 @@ describe('create event reducer', () => {
                 zip: '50123'
             },
 
-            weightInPounds: 10
+            weightInPounds: 10,
+            cost: 100
         };
     });
 
@@ -58,6 +59,10 @@ describe('create event reducer', () => {
 
         it('should copy over the weightInPounds', () => {
             expect(resultingShipment.weightInPounds).toEqual(10);
+        });
+
+        it('should copy over cost', () => {
+            expect(resultingShipment.cost).toEqual(100);
         });
     });
 
