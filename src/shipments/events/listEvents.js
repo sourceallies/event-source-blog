@@ -1,9 +1,12 @@
 
+const mongoClient = require('../../configuredMongoClient');
+
+
 async function handler(request, h) {
     const shipmentId = request.params.shipmentId;
-    const {shipmentEventsCollection} = request.server.app;
 
-    const events = await shipmentEventsCollection
+    const events = await mongoClient.db('shipment')
+        .collection('shipment_events')
         .find({shipmentId})
         .sort([['eventTimestamp', 1]])
         .toArray();
