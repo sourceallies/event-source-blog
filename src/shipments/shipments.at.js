@@ -117,13 +117,13 @@ describe('acceptance tests', () => {
         });
     });
 
-    describe('delivered event', () => {
+    describe('deliver event', () => {
         let response;
 
         beforeAll(async () => {
             const deliveredEvent = {
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/delivered`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/deliver`, {
                 method: 'POST',
                 body: JSON.stringify(deliveredEvent)
             });
