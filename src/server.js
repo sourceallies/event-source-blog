@@ -27,11 +27,8 @@ async function init() {
     });
     server.events.on('request', logRequestEvent);
     await mongoClient.connect();
-    //TODO: move somewhere
-    await mongoClient
-        .db('shipment')
-        .collection('shipment_events')
-        .createIndex('shipmentId');
+    await mongoClient.configureIndexes();
+
 
     await configuredKafka.producer.connect();
     await require('./shipments/events/setupSaveEventListener')();
