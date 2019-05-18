@@ -70,6 +70,24 @@ describe('acceptance tests', () => {
         expect(response.status).toEqual(409);
     });
 
+    describe('listing endpoint', () => {
+        let response;
+        let responseBody;
+
+        beforeAll(async () => {
+            response = await fetch(`${baseURL}/shipments`);
+            responseBody = response.ok && await response.json();
+        });
+
+        it('should return an ok response', () => {
+            expect(response.status).toEqual(200);
+        });
+
+        it('should return an array with at least one item', async () => {
+            expect(responseBody.length).toBeGreaterThan(0);
+        });
+    });
+
     describe('assign shipment', () => {
         let response;
 
