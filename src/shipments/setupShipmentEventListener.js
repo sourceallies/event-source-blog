@@ -2,6 +2,7 @@
 const shipmentEventReducer = require('./events/reducer');
 const mongoClient = require('../configuredMongoClient');
 const kafka = require('../configuredKafka');
+const IllegalShipmentStateError = require('./events/IllegalShipmentStateError');
 
 async function eachMessage({ message }) {
     const event = JSON.parse(message.value);
@@ -10,12 +11,20 @@ async function eachMessage({ message }) {
         .collection('shipments');
 
     const loadedShipment = await collection.findOne({_id});
-    const updatedShipment = shipmentEventReducer(loadedShipment, event);
-    await collection.replaceOne({_id}, updatedShipment, {upsert: true});
-    console.log('updated shipment: ', updatedShipment);
+    try {
+        const updatedShipment = shipmentEventReducer(loadedShipment, event);
+        await collection.replaceOne({_id}, updatedShipment, {upsert: true});
+        console.log('updated shipment: ', updatedShipment);
+    } catch (e) {
+        if (e instanceof IllegalShipmentStateError) {
+            console.warn('Cannot reduce event ' + e);
+        } else {
+            throw e;
+        }
+    }
 }
 
-module.exports = async function setupShipmentEventListener(server) {
+module.exports = async function setupShipmentEventListener() {
     const consumer = kafka.consumer({ groupId: 'shipment-events-to-shipment' });
     await consumer.connect();
     await consumer.subscribe({ topic: 'shipment-events' });

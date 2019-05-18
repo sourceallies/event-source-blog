@@ -13,12 +13,18 @@ jest.mock('./createEventSchema', () => {
 });
 const createEventSchema = require('./createEventSchema');
 
+jest.mock('../../loadShipment', () => jest.fn());
+const loadShipment = require('../../loadShipment');
+
+jest.mock('./createEventReducer', () => jest.fn());
+
 describe('Post shipment', () => {
     let server;
     let request;
 
     beforeEach(() => {
         createEventSchema._validateWithOptions.mockImplementation((value) => value);
+        loadShipment.mockResolvedValue();
 
         server = new Server();
         server.route(require('./postShipment'));

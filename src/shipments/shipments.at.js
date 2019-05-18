@@ -61,6 +61,15 @@ describe('acceptance tests', () => {
         });
     });
 
+    it('should not let us attempt to ship before it is assigned', async () => {
+        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/shipped`, {
+            method: 'POST',
+            body: JSON.stringify({})
+        });
+
+        expect(response.status).toEqual(409);
+    });
+
     describe('assign shipment', () => {
         let response;
 
