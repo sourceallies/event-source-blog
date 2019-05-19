@@ -141,4 +141,25 @@ describe('acceptance tests', () => {
             expect(shipment.status).toEqual('Delivered');
         });
     });
+
+    describe('invoice the billTo account', () => {
+        let response;
+        let accountEvents;
+
+        beforeAll(async () => {
+            await wait(1000);
+            response = await fetch(`${baseURL}/accounts/${accountId}/events`);
+            accountEvents = response.ok && await response.json();
+        });
+
+        it('should return a non-empty array', () => {
+            expect(accountEvents.length).toBeGreaterThan(0);
+        });
+
+        it('should have an event for this shipment', () => {
+            expect(accountEvents).toContain(expect.objectContaining({
+                shipmentId
+            }));
+        });
+    });
 });
