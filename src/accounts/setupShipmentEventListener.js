@@ -1,15 +1,17 @@
 
 const kafka = require('../configuredKafka');
 const publishEvent = require('./events/publishEvent');
+const loadShipment = require('../shipments/loadShipment');
 
 async function publishInvoiceEvent(shipmentEvent) {
     const eventTimestamp = new Date(Date.now()).toISOString();
+    const {billToAccountId, cost} = await loadShipment(shipmentEvent.shipmentId);
     const invoiceEvent = {
         _id: `${shipmentEvent._id}-invoice`,
-        accountId: 'TODO', //TODO: how do we get this value?
+        accountId: billToAccountId,
         eventTimestamp,
         eventType: 'shipment-invoice',
-        amount: -1 * 0, //TODO: how do we get this value?
+        amount: -1 * cost,
         shipmentId: shipmentEvent.shipmentId
     };
     await publishEvent(invoiceEvent);
