@@ -157,7 +157,7 @@ describe('acceptance tests', () => {
         });
 
         it('should have an event for this shipment', () => {
-            expect(accountEvents).toContain(expect.objectContaining({
+            expect(accountEvents).toContainEqual(expect.objectContaining({
                 shipmentId
             }));
         });
