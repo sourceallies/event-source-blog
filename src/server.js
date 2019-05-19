@@ -40,7 +40,7 @@ async function init() {
     server.route(require('./root'));
 
     server.route(require('./accounts/events/listEvents'));
-
+    server.route(require('./accounts/events/payment/paymentHandler'));
     server.route(require('./shipments/getShipmentById'));
     server.route(require('./shipments/events/listEvents'));
     server.route(require('./shipments/events/create/postShipment'));
