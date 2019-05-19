@@ -29,12 +29,18 @@ async function init() {
     await mongoClient.connect();
     await mongoClient.configureIndexes();
 
-
     await configuredKafka.producer.connect();
-    await require('./shipments/events/setupSaveEventListener')();
-    await require('./shipments/setupShipmentEventListener')();
+    await Promise.all([
+        require('./shipments/events/setupSaveEventListener')(),
+        require('./shipments/setupShipmentEventListener')(),
+        require('./accounts/events/setupSaveEventListener')(),
+        require('./accounts/setupShipmentEventListener')()
+    ]);
 
     server.route(require('./root'));
+
+    server.route(require('./accounts/events/listEvents'));
+
     server.route(require('./shipments/getShipmentById'));
     server.route(require('./shipments/events/listEvents'));
     server.route(require('./shipments/events/create/postShipment'));
