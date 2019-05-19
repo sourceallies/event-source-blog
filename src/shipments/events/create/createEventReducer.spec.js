@@ -26,6 +26,7 @@ describe('create event reducer', () => {
             },
 
             weightInPounds: 10,
+            billToAccountId: 'acc123',
             cost: 100
         };
     });
@@ -63,6 +64,10 @@ describe('create event reducer', () => {
 
         it('should copy over cost', () => {
             expect(resultingShipment.cost).toEqual(100);
+        });
+
+        it('should copy over billToAccountId', () => {
+            expect(resultingShipment.billToAccountId).toEqual('acc123');
         });
     });
 
