@@ -116,4 +116,27 @@ describe('acceptance tests', () => {
             expect(shipment.status).toEqual('Shipped');
         });
     });
+
+    describe('deliver event', () => {
+        let response;
+
+        beforeAll(async () => {
+            const deliveredEvent = {
+            };
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/deliver`, {
+                method: 'POST',
+                body: JSON.stringify(deliveredEvent)
+            });
+        });
+
+        it('should return an ok response', () => {
+            expect(response.status).toEqual(202);
+        });
+
+        it('should show the shipment in "Delivered" status', async () => {
+            await wait(1000);
+            const shipment = await getShipment();
+            expect(shipment.status).toEqual('Delivered');
+        });
+    });
 });

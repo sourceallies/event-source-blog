@@ -29,6 +29,7 @@
     "mongodb": "^3.2.3"
   },
   "devDependencies": {
+    "chance": "^1.0.18",
     "eslint": "^5.16.0",
     "jasmine-fail-fast": "^2.0.0",
     "jest": "^24.7.1",
