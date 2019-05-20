@@ -22,6 +22,8 @@ These events represent the activity taking place:
 - Assigning a shipment is a POST to `/shipments/{shipmentId}/events/assign`
 - Marking it as shiped is a POST to `/shipments/{shipmentId}/events/ship`
 - Delivering it is a POST to `/shipments/{shipmentId}/events/deliver`
+- Viewing a single shipment is a GET to `/shipments/{shipmentId}`
+- Viewing a list of shipments is a GET to `/shipments`
 
 This strategy opens up several options to keep our application simple.
 Because each activity is its own endpoint, the payload that is posted to that endpoint can be different.
