@@ -5,6 +5,8 @@ const failFast = require('jasmine-fail-fast');
 // eslint-disable-next-line no-undef
 jasmine.getEnv().addReporter(failFast.init());
 
+jest.setTimeout(50000)
+
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
     const accountId = shortid.generate();
