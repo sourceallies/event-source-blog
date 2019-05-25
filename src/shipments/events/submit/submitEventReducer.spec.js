@@ -1,8 +1,8 @@
 
 const IllegalShipmentStateError = require('../IllegalShipmentStateError');
-const createEventReducer = require('./createEventReducer');
+const createEventReducer = require('./submitEventReducer');
 
-describe('create event reducer', () => {
+describe('submit event reducer', () => {
     let event;
 
     beforeEach(() => {
