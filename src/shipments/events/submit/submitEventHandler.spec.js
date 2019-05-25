@@ -65,9 +65,7 @@ describe('Post shipment', () => {
 
         it('should send a submit event to the shipment-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
-                eventTimestamp: '2019-03-04T02:30:45.000Z',
                 eventType: 'submit',
                 weightInPounds: 20
             }));
