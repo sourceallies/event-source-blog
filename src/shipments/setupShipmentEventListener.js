@@ -27,10 +27,15 @@ async function reverseEvent(event) {
 
 async function eachMessage({ message }) {
     const event = JSON.parse(message.value);
+    const eventTimestamp = new Date(+message.timestamp).toISOString();
+    const eventWithTimestap = {
+        ...event,
+        eventTimestamp
+    };
 
     const loadedShipment = await loadShipment(event.shipmentId);
     try {
-        const updatedShipment = shipmentEventReducer(loadedShipment, event);
+        const updatedShipment = shipmentEventReducer(loadedShipment, eventWithTimestap);
         await saveShipment(updatedShipment);
         console.log('updated shipment: ', updatedShipment);
     } catch (e) {
