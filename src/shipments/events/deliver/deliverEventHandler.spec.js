@@ -5,41 +5,35 @@ const MockDate = require('mockdate');
 jest.mock('../publishEvent', () => jest.fn());
 const publishEvent = require('../publishEvent');
 
-jest.mock('./createEventSchema', () => {
+jest.mock('./deliverEventSchema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const createEventSchema = require('./createEventSchema');
+const deliverEventSchema = require('./deliverEventSchema');
 
 jest.mock('../../loadShipment', () => jest.fn());
 const loadShipment = require('../../loadShipment');
 
-jest.mock('./calculateCost', () => jest.fn());
-const calculateCost = require('./calculateCost');
+jest.mock('./deliverEventReducer', () => jest.fn());
 
-jest.mock('./createEventReducer', () => jest.fn());
-
-describe('Post shipment', () => {
+describe('Deliver shipment', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        createEventSchema._validateWithOptions.mockImplementation((value) => value);
-        loadShipment.mockResolvedValue();
+        deliverEventSchema._validateWithOptions.mockImplementation((value) => value);
+        loadShipment.mockResolvedValue({});
 
         server = new Server();
-        server.route(require('./postShipment'));
+        server.route(require('./deliverEventHandler'));
         publishEvent.mockResolvedValue();
 
-        calculateCost.mockReturnValue(50);
-
         request = {
-            url: '/shipments/ship1234/events/create',
+            url: '/shipments/ship1234/events/deliver',
             method: 'POST',
             payload: {
-                weightInPounds: 20
             }
         };
     });
@@ -48,7 +42,7 @@ describe('Post shipment', () => {
         MockDate.reset();
     });
 
-    describe('A valid create event is received', () => {
+    describe('A valid deliver event is received', () => {
         let response;
         beforeEach(async () => {
             MockDate.set('2019-03-04T02:30:45.000Z');
@@ -59,23 +53,12 @@ describe('Post shipment', () => {
             expect(response.statusCode).toEqual(202);
         });
 
-        it('shoudld calculate the cost', () => {
-            expect(calculateCost).toHaveBeenCalledWith(request.payload);
-        });
-
-        it('should send a create event to the shipment-events topic', () => {
+        it('should send a deliver event to the shipment-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
                 _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
                 eventTimestamp: '2019-03-04T02:30:45.000Z',
-                eventType: 'create',
-                weightInPounds: 20
-            }));
-        });
-
-        it('should set the cost', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                cost: 50
+                eventType: 'deliver'
             }));
         });
     });
@@ -83,7 +66,7 @@ describe('Post shipment', () => {
     describe('An invalid event is received', () => {
         let response;
         beforeEach(async () => {
-            createEventSchema._validateWithOptions.mockImplementation(() => {
+            deliverEventSchema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);

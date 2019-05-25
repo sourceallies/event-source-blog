@@ -9,6 +9,7 @@ jest.setTimeout(50000)
 
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
+    const accountId = shortid.generate();
     const baseURL = 'http://localhost:3000';
 
     async function wait(ms) {
@@ -31,19 +32,20 @@ describe('acceptance tests', () => {
         beforeAll(async () => {
             const createEvent = {
                 shipFrom: {
-                    name: 'Bill',
-                    line1: '123 Main st',
-                    city: 'Anywhere',
+                    name: 'Source Allies',
+                    line1: '4501 NW Urbandale Dr',
+                    city: 'Urbandale',
                     state: 'IA',
-                    zip: '50123'
+                    zip: '50322'
                 },
                 shipTo: {
-                    name: 'Acme Corp',
-                    line1: '455 Mulburry st',
-                    city: 'Anywhere',
+                    name: 'Iowa State Capital',
+                    line1: '1007 Grand Ave',
+                    city: 'Des Moines',
                     state: 'IA',
-                    zip: '50123'
+                    zip: '50309'
                 },
+                billToAccountId: accountId,
                 weightInPounds: 10
             };
             response = await fetch(`${baseURL}/shipments/${shipmentId}/events/create`, {
@@ -70,6 +72,24 @@ describe('acceptance tests', () => {
         });
 
         expect(response.status).toEqual(409);
+    });
+
+    describe('listing endpoint', () => {
+        let response;
+        let responseBody;
+
+        beforeAll(async () => {
+            response = await fetch(`${baseURL}/shipments`);
+            responseBody = response.ok && await response.json();
+        });
+
+        it('should return an ok response', () => {
+            expect(response.status).toEqual(200);
+        });
+
+        it('should return an array with at least one item', async () => {
+            expect(responseBody.length).toBeGreaterThan(0);
+        });
     });
 
     describe('assign shipment', () => {
@@ -116,6 +136,29 @@ describe('acceptance tests', () => {
             await wait(1000);
             const shipment = await getShipment();
             expect(shipment.status).toEqual('Shipped');
+        });
+    });
+
+    describe('deliver event', () => {
+        let response;
+
+        beforeAll(async () => {
+            const deliveredEvent = {
+            };
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/deliver`, {
+                method: 'POST',
+                body: JSON.stringify(deliveredEvent)
+            });
+        });
+
+        it('should return an ok response', () => {
+            expect(response.status).toEqual(202);
+        });
+
+        it('should show the shipment in "Delivered" status', async () => {
+            await wait(1000);
+            const shipment = await getShipment();
+            expect(shipment.status).toEqual('Delivered');
         });
     });
 });
