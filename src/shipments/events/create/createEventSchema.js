@@ -16,7 +16,8 @@ module.exports = Joi.object({
     shipFrom: address,
     shipTo: address,
     weightInPounds: Joi.number()
-        .min(1)
+        .min(1),
+    billToAccountId: Joi.string()
 }).options({
     presence: 'required',
     abortEarly: false

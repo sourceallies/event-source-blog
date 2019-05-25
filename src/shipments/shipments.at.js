@@ -7,6 +7,7 @@ jasmine.getEnv().addReporter(failFast.init());
 
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
+    const accountId = shortid.generate();
     const baseURL = 'http://localhost:3000';
 
     async function wait(ms) {
@@ -29,19 +30,20 @@ describe('acceptance tests', () => {
         beforeAll(async () => {
             const createEvent = {
                 shipFrom: {
-                    name: 'Bill',
-                    line1: '123 Main st',
-                    city: 'Anywhere',
+                    name: 'Source Allies',
+                    line1: '4501 NW Urbandale Dr',
+                    city: 'Urbandale',
                     state: 'IA',
-                    zip: '50123'
+                    zip: '50322'
                 },
                 shipTo: {
-                    name: 'Acme Corp',
-                    line1: '455 Mulburry st',
-                    city: 'Anywhere',
+                    name: 'Iowa State Capital',
+                    line1: '1007 Grand Ave',
+                    city: 'Des Moines',
                     state: 'IA',
-                    zip: '50123'
+                    zip: '50309'
                 },
+                billToAccountId: accountId,
                 weightInPounds: 10
             };
             response = await fetch(`${baseURL}/shipments/${shipmentId}/events/create`, {
