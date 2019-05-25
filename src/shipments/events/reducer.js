@@ -1,8 +1,8 @@
 
 const reducersByEventType = {
-    create: require('./create/createEventReducer'),
+    submit: require('./submit/submitEventReducer'),
     assign: require('./assign/assignEventReducer'),
-    shipped: require('./shipped/shippedEventReducer'),
+    ship: require('./ship/shipEventReducer'),
     deliver: require('./deliver/deliverEventReducer'),
     'reverse-event': require('./reverse-event/reverseEventReducer')
 };

@@ -1,7 +1,7 @@
-const shippedEventSchema = require('./shippedEventSchema');
+const shipEventSchema = require('./shipEventSchema');
 const publishEvent = require('../publishEvent');
 const loadShipment = require('../../loadShipment');
-const shippedEventReducer = require('./shippedEventReducer');
+const shippedEventReducer = require('./shipEventReducer');
 
 function buildEventToSave({payload, params}) {
     const shipmentId = params.shipmentId;
@@ -12,7 +12,7 @@ function buildEventToSave({payload, params}) {
         _id: `${shipmentId}-${eventTimestamp}`,
         shipmentId,
         eventTimestamp,
-        eventType: 'shipped'
+        eventType: 'ship'
     };
 }
 
@@ -28,10 +28,10 @@ async function handler(request, h) {
 module.exports = {
     handler,
     method: 'POST',
-    path: '/shipments/{shipmentId}/events/shipped',
+    path: '/shipments/{shipmentId}/events/ship',
     config: {
         validate: {
-            payload: shippedEventSchema
+            payload: shipEventSchema
         }
     }
 };

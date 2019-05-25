@@ -26,11 +26,11 @@ describe('acceptance tests', () => {
         throw new Error(`${response.statusCode}: ${txt}`);
     }
 
-    describe('create event', () => {
+    describe('submit event', () => {
         let response;
 
         beforeAll(async () => {
-            const createEvent = {
+            const submitEvent = {
                 shipFrom: {
                     name: 'Source Allies',
                     line1: '4501 NW Urbandale Dr',
@@ -48,9 +48,9 @@ describe('acceptance tests', () => {
                 billToAccountId: accountId,
                 weightInPounds: 10
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/create`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/submit`, {
                 method: 'POST',
-                body: JSON.stringify(createEvent)
+                body: JSON.stringify(submitEvent)
             });
         });
 
@@ -66,7 +66,7 @@ describe('acceptance tests', () => {
     });
 
     it('should not let us attempt to ship before it is assigned', async () => {
-        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/shipped`, {
+        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
             method: 'POST',
             body: JSON.stringify({})
         });
@@ -122,7 +122,7 @@ describe('acceptance tests', () => {
         beforeAll(async () => {
             const shipEvent = {
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/shipped`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
                 method: 'POST',
                 body: JSON.stringify(shipEvent)
             });

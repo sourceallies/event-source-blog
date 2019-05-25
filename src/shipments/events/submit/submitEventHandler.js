@@ -1,7 +1,7 @@
-const createEventSchema = require('./createEventSchema');
+const submitEventSchema = require('./submitEventSchema');
 const publishEvent = require('../publishEvent');
 const loadShipment = require('../../loadShipment');
-const createEventReducer = require('./createEventReducer');
+const submitEventReducer = require('./submitEventReducer');
 const calculateCost = require('./calculateCost');
 
 function buildEventToSend({payload, params}) {
@@ -13,7 +13,7 @@ function buildEventToSend({payload, params}) {
         _id: `${shipmentId}-${eventTimestamp}`,
         shipmentId,
         eventTimestamp,
-        eventType: 'create',
+        eventType: 'submit',
         cost: calculateCost(payload)
     };
 }
@@ -21,7 +21,7 @@ function buildEventToSend({payload, params}) {
 async function handler(request, h) {
     const event = buildEventToSend(request);
     const shipment = await loadShipment(event.shipmentId);
-    createEventReducer(shipment, event);
+    submitEventReducer(shipment, event);
 
     await publishEvent(event);
     request.log(['info'], {event});
@@ -31,10 +31,10 @@ async function handler(request, h) {
 module.exports = {
     handler,
     method: 'POST',
-    path: '/shipments/{shipmentId}/events/create',
+    path: '/shipments/{shipmentId}/events/submit',
     config: {
         validate: {
-            payload: createEventSchema
+            payload: submitEventSchema
         }
     }
 };
