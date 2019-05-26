@@ -23,6 +23,6 @@ module.exports = function deliverEventReducer(shipment, deliverEvent) {
     return {
         ...shipment,
         status: 'Delivered',
-        lastEventTimestamp: deliverEvent.eventTimestamp,
+        lastEventTimestamp: deliverEvent.eventTimestamp
     };
 };
