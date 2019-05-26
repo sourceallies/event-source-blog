@@ -35,6 +35,10 @@ describe('deliver event reducer', () => {
         it('should keep unknown fields on shipment', () => {
             expect(resultingShipment).toHaveProperty(randomFieldName, randomFieldName);
         });
+
+        it('should set lastEventTimestamp', () => {
+            expect(resultingShipment.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
+        });
     });
 
     describe('shipment does not exist', () => {

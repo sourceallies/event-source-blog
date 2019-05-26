@@ -16,6 +16,7 @@ module.exports = function shippedEventReducer(shipment, shipEvent) {
     return {
         ...shipment,
         status: 'Shipped',
+        lastEventTimestamp: shipEvent.eventTimestamp,
         shipDate: shipEvent.eventTimestamp
     };
 };

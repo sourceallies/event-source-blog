@@ -69,6 +69,10 @@ describe('submit event reducer', () => {
         it('should copy over billToAccountId', () => {
             expect(resultingShipment.billToAccountId).toEqual('acc123');
         });
+
+        it('should set lastEventTimestamp', () => {
+            expect(resultingShipment.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
+        });
     });
 
     describe('shipment already exists', () => {
