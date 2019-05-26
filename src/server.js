@@ -27,17 +27,20 @@ async function init() {
     });
     server.events.on('request', logRequestEvent);
     await mongoClient.connect();
-    //TODO: move somewhere
-    await mongoClient
-        .db('shipment')
-        .collection('shipment_events')
-        .createIndex('shipmentId');
+    await mongoClient.configureIndexes();
 
     await configuredKafka.producer.connect();
-    await require('./shipments/events/setupSaveEventListener')();
-    await require('./shipments/setupShipmentEventListener')();
+    await Promise.all([
+        require('./shipments/events/setupSaveEventListener')(),
+        require('./shipments/setupShipmentEventListener')(),
+        require('./accounts/events/setupSaveEventListener')(),
+        require('./accounts/setupShipmentEventListener')()
+    ]);
 
     server.route(require('./root'));
+
+    server.route(require('./accounts/events/listEvents'));
+    server.route(require('./accounts/events/payment/paymentHandler'));
     server.route(require('./shipments/listShipments'));
     server.route(require('./shipments/getShipmentById'));
     server.route(require('./shipments/events/listEvents'));

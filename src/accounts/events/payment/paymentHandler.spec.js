@@ -5,41 +5,30 @@ const MockDate = require('mockdate');
 jest.mock('../publishEvent', () => jest.fn());
 const publishEvent = require('../publishEvent');
 
-jest.mock('./submitEventSchema', () => {
+jest.mock('./paymentEventSchema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const submitEventSchema = require('./submitEventSchema');
+const paymentEventSchema = require('./paymentEventSchema');
 
-jest.mock('../../loadShipment', () => jest.fn());
-const loadShipment = require('../../loadShipment');
-
-jest.mock('./calculateCost', () => jest.fn());
-const calculateCost = require('./calculateCost');
-
-jest.mock('./submitEventReducer', () => jest.fn());
-
-describe('Post shipment', () => {
+describe('Payment event handler', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        submitEventSchema._validateWithOptions.mockImplementation((value) => value);
-        loadShipment.mockResolvedValue();
+        paymentEventSchema._validateWithOptions.mockImplementation((value) => value);
 
         server = new Server();
-        server.route(require('./submitEventHandler'));
+        server.route(require('./paymentHandler'));
         publishEvent.mockResolvedValue();
 
-        calculateCost.mockReturnValue(50);
-
         request = {
-            url: '/shipments/ship1234/events/submit',
+            url: '/accounts/acc123/events/payment',
             method: 'POST',
             payload: {
-                weightInPounds: 20
+                amount: 20
             }
         };
     });
@@ -48,7 +37,7 @@ describe('Post shipment', () => {
         MockDate.reset();
     });
 
-    describe('A valid submit event is received', () => {
+    describe('A valid payment event is received', () => {
         let response;
         beforeEach(async () => {
             MockDate.set('2019-03-04T02:30:45.000Z');
@@ -59,21 +48,11 @@ describe('Post shipment', () => {
             expect(response.statusCode).toEqual(202);
         });
 
-        it('shoudld calculate the cost', () => {
-            expect(calculateCost).toHaveBeenCalledWith(request.payload);
-        });
-
-        it('should send a submit event to the shipment-events topic', () => {
+        it('should send a payment event to the account-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                shipmentId: 'ship1234',
-                eventType: 'submit',
-                weightInPounds: 20
-            }));
-        });
-
-        it('should set the cost', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                cost: 50
+                accountId: 'acc123',
+                eventType: 'payment',
+                amount: 20
             }));
         });
     });
@@ -81,7 +60,7 @@ describe('Post shipment', () => {
     describe('An invalid event is received', () => {
         let response;
         beforeEach(async () => {
-            submitEventSchema._validateWithOptions.mockImplementation(() => {
+            paymentEventSchema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);

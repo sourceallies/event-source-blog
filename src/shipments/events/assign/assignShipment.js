@@ -5,13 +5,10 @@ const assignEventReducer = require('./assignEventReducer');
 
 function buildEventToSave({payload, params}) {
     const shipmentId = params.shipmentId;
-    const eventTimestamp = new Date(Date.now()).toISOString();
 
     return {
         ...payload,
-        _id: `${shipmentId}-${eventTimestamp}`,
         shipmentId,
-        eventTimestamp,
         eventType: 'assign'
     };
 }

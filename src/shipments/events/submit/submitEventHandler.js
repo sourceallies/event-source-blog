@@ -6,13 +6,10 @@ const calculateCost = require('./calculateCost');
 
 function buildEventToSend({payload, params}) {
     const shipmentId = params.shipmentId;
-    const eventTimestamp = new Date(Date.now()).toISOString();
 
     return {
         ...payload,
-        _id: `${shipmentId}-${eventTimestamp}`,
         shipmentId,
-        eventTimestamp,
         eventType: 'submit',
         cost: calculateCost(payload)
     };

@@ -12,12 +12,12 @@ function getEventFromMessage({value, timestamp}) {
 
 async function eachMessage({ message }) {
     const event = getEventFromMessage(message);
+    const _id = `${event.accountId}-${event.eventTimestamp}`;
     console.log('Got event: ', event);
 
-    const _id = `${event.shipmentId}-${event.eventTimestamp}`;
     await mongoClient
-        .db('shipment')
-        .collection('shipment_events')
+        .db('accounting')
+        .collection('account_events')
         .replaceOne(
             {_id},
             {
@@ -29,8 +29,8 @@ async function eachMessage({ message }) {
 }
 
 module.exports = async function setupSaveEventListener() {
-    const consumer = kafka.consumer({ groupId: 'shipment-events-persist' });
+    const consumer = kafka.consumer({ groupId: 'account-events-persist' });
     await consumer.connect();
-    await consumer.subscribe({ topic: 'shipment-events' });
+    await consumer.subscribe({ topic: 'account-events' });
     await consumer.run({eachMessage});
 };

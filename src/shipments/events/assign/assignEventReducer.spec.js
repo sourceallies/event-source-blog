@@ -34,6 +34,10 @@ describe('assign event reducer', () => {
         it('should set assignedToTruck to the truckId ', () => {
             expect(resultingShipment.assignedToTruck).toEqual('56');
         });
+
+        it('should set lastEventTimestamp', () => {
+            expect(resultingShipment.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
+        });
     });
 
     describe('shipment does not exist', () => {

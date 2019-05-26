@@ -1,6 +1,5 @@
 
 const {Server} = require('hapi');
-const MockDate = require('mockdate');
 
 jest.mock('../publishEvent', () => jest.fn());
 const publishEvent = require('../publishEvent');
@@ -38,14 +37,9 @@ describe('Deliver shipment', () => {
         };
     });
 
-    afterEach(() => {
-        MockDate.reset();
-    });
-
     describe('A valid deliver event is received', () => {
         let response;
         beforeEach(async () => {
-            MockDate.set('2019-03-04T02:30:45.000Z');
             response = await server.inject(request);
         });
 
@@ -55,9 +49,7 @@ describe('Deliver shipment', () => {
 
         it('should send a deliver event to the shipment-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
-                eventTimestamp: '2019-03-04T02:30:45.000Z',
                 eventType: 'deliver'
             }));
         });

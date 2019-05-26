@@ -5,7 +5,7 @@ const failFast = require('jasmine-fail-fast');
 // eslint-disable-next-line no-undef
 jasmine.getEnv().addReporter(failFast.init());
 
-jest.setTimeout(50000)
+jest.setTimeout(50000);
 
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
@@ -159,6 +159,27 @@ describe('acceptance tests', () => {
             await wait(1000);
             const shipment = await getShipment();
             expect(shipment.status).toEqual('Delivered');
+        });
+    });
+
+    describe('invoice the billTo account', () => {
+        let response;
+        let accountEvents;
+
+        beforeAll(async () => {
+            await wait(1000);
+            response = await fetch(`${baseURL}/accounts/${accountId}/events`);
+            accountEvents = response.ok && await response.json();
+        });
+
+        it('should return a non-empty array', () => {
+            expect(accountEvents.length).toBeGreaterThan(0);
+        });
+
+        it('should have an event for this shipment', () => {
+            expect(accountEvents).toContainEqual(expect.objectContaining({
+                shipmentId
+            }));
         });
     });
 });

@@ -12,10 +12,25 @@ const client = new MongoClient(getMongoURL(), {
     useNewUrlParser: true
 });
 
-function onConnect(...args) {
-    console.log('connected: ', args);
+async function configureShipmentIndexes() {
+    await client
+        .db('shipment')
+        .collection('shipment_events')
+        .createIndex('shipmentId');
 }
 
-client.on('connected', onConnect);
+async function configureAccountIndexes() {
+    await client
+        .db('accounting')
+        .collection('account_events')
+        .createIndex('accountId');
+}
+
+client.configureIndexes = async function configureIndexes() {
+    await Promise.all([
+        configureAccountIndexes(),
+        configureShipmentIndexes()
+    ]);
+};
 
 module.exports = client;
