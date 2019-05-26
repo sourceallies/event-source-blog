@@ -25,10 +25,27 @@ async function reverseEvent(event) {
     await publishEvent(reversalEvent);
 }
 
+function getEventFromMessage({value, timestamp}) {
+    const eventTimestamp = new Date(+timestamp).toISOString();
+    return {
+        ...JSON.parse(value),
+        eventTimestamp
+    };
+}
+
+function eventAlreadyProcessed(shipment, eventTimestamp) {
+    return shipment &&
+        shipment.lastEventTimestamp &&
+        Date.parse(shipment.lastEventTimestamp) >= eventTimestamp;
+}
+
 async function eachMessage({ message }) {
-    const event = JSON.parse(message.value);
+    const event = getEventFromMessage(message);
 
     const loadedShipment = await loadShipment(event.shipmentId);
+    if (eventAlreadyProcessed(loadedShipment, message.timestamp)) {
+        return;
+    }
     try {
         const updatedShipment = shipmentEventReducer(loadedShipment, event);
         await saveShipment(updatedShipment);

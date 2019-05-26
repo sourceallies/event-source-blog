@@ -9,6 +9,7 @@ module.exports = function submitEventReducer(shipment, submitEvent) {
     return {
         _id: shipmentId,
         createdTimestamp: eventTimestamp,
+        lastEventTimestamp: eventTimestamp,
         status: 'Submitted',
         shipFrom,
         shipTo,

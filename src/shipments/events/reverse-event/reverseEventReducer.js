@@ -1,4 +1,7 @@
 
-module.exports = function reverseEventReducer(shipment) {
-    return shipment;
+module.exports = function reverseEventReducer(shipment, reverseEvent) {
+    return {
+        ...shipment,
+        lastEventTimestamp: reverseEvent.eventTimestamp
+    };
 };
