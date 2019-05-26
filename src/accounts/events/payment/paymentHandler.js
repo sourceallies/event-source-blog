@@ -3,13 +3,10 @@ const publishEvent = require('../publishEvent');
 
 function buildEventToSend({payload, params}) {
     const accountId = params.accountId;
-    const eventTimestamp = new Date(Date.now()).toISOString();
 
     return {
         ...payload,
-        _id: `${accountId}-${eventTimestamp}`,
         accountId,
-        eventTimestamp,
         eventType: 'payment'
     };
 }

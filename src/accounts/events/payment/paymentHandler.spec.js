@@ -50,9 +50,7 @@ describe('Payment event handler', () => {
 
         it('should send a payment event to the account-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
-                _id: 'acc123-2019-03-04T02:30:45.000Z',
                 accountId: 'acc123',
-                eventTimestamp: '2019-03-04T02:30:45.000Z',
                 eventType: 'payment',
                 amount: 20
             }));

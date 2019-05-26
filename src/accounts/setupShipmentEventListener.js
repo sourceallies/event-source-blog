@@ -4,15 +4,14 @@ const publishEvent = require('./events/publishEvent');
 const loadShipment = require('../shipments/loadShipment');
 
 async function publishInvoiceEvent(shipmentEvent) {
-    const eventTimestamp = new Date(Date.now()).toISOString();
-    const {billToAccountId, cost} = await loadShipment(shipmentEvent.shipmentId);
+    const {shipmentId} = shipmentEvent;
+    const {billToAccountId, cost} = await loadShipment(shipmentId);
     const invoiceEvent = {
-        _id: `${shipmentEvent._id}-invoice`,
+        _id: `${shipmentId}-invoice`,
         accountId: billToAccountId,
-        eventTimestamp,
         eventType: 'shipment-invoice',
         amount: -1 * cost,
-        shipmentId: shipmentEvent.shipmentId
+        shipmentId,
     };
     await publishEvent(invoiceEvent);
 }
