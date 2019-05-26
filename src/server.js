@@ -4,6 +4,7 @@ require('dotenv-flow').config();
 const {Server} = require('hapi');
 const mongoClient = require('./configuredMongoClient');
 const configuredKafka = require('./configuredKafka');
+const setupEventListener = require('./setupEventListener');
 
 function logRequestEvent(_request, {tags, data}) {
     console.log(tags, data);
