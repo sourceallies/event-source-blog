@@ -5,13 +5,13 @@ const MockDate = require('mockdate');
 jest.mock('../publishEvent', () => jest.fn());
 const publishEvent = require('../publishEvent');
 
-jest.mock('./createEventSchema', () => {
+jest.mock('./submitEventSchema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const createEventSchema = require('./createEventSchema');
+const submitEventSchema = require('./submitEventSchema');
 
 jest.mock('../../loadShipment', () => jest.fn());
 const loadShipment = require('../../loadShipment');
@@ -19,24 +19,24 @@ const loadShipment = require('../../loadShipment');
 jest.mock('./calculateCost', () => jest.fn());
 const calculateCost = require('./calculateCost');
 
-jest.mock('./createEventReducer', () => jest.fn());
+jest.mock('./submitEventReducer', () => jest.fn());
 
 describe('Post shipment', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        createEventSchema._validateWithOptions.mockImplementation((value) => value);
+        submitEventSchema._validateWithOptions.mockImplementation((value) => value);
         loadShipment.mockResolvedValue();
 
         server = new Server();
-        server.route(require('./postShipment'));
+        server.route(require('./submitEventHandler'));
         publishEvent.mockResolvedValue();
 
         calculateCost.mockReturnValue(50);
 
         request = {
-            url: '/shipments/ship1234/events/create',
+            url: '/shipments/ship1234/events/submit',
             method: 'POST',
             payload: {
                 weightInPounds: 20
@@ -48,7 +48,7 @@ describe('Post shipment', () => {
         MockDate.reset();
     });
 
-    describe('A valid create event is received', () => {
+    describe('A valid submit event is received', () => {
         let response;
         beforeEach(async () => {
             MockDate.set('2019-03-04T02:30:45.000Z');
@@ -63,12 +63,12 @@ describe('Post shipment', () => {
             expect(calculateCost).toHaveBeenCalledWith(request.payload);
         });
 
-        it('should send a create event to the shipment-events topic', () => {
+        it('should send a submit event to the shipment-events topic', () => {
             expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
                 _id: 'ship1234-2019-03-04T02:30:45.000Z',
                 shipmentId: 'ship1234',
                 eventTimestamp: '2019-03-04T02:30:45.000Z',
-                eventType: 'create',
+                eventType: 'submit',
                 weightInPounds: 20
             }));
         });
@@ -83,7 +83,7 @@ describe('Post shipment', () => {
     describe('An invalid event is received', () => {
         let response;
         beforeEach(async () => {
-            createEventSchema._validateWithOptions.mockImplementation(() => {
+            submitEventSchema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);

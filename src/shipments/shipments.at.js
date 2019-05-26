@@ -5,6 +5,8 @@ const failFast = require('jasmine-fail-fast');
 // eslint-disable-next-line no-undef
 jasmine.getEnv().addReporter(failFast.init());
 
+jest.setTimeout(50000)
+
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
     const accountId = shortid.generate();
@@ -24,11 +26,11 @@ describe('acceptance tests', () => {
         throw new Error(`${response.statusCode}: ${txt}`);
     }
 
-    describe('create event', () => {
+    describe('submit event', () => {
         let response;
 
         beforeAll(async () => {
-            const createEvent = {
+            const submitEvent = {
                 shipFrom: {
                     name: 'Source Allies',
                     line1: '4501 NW Urbandale Dr',
@@ -46,9 +48,9 @@ describe('acceptance tests', () => {
                 billToAccountId: accountId,
                 weightInPounds: 10
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/create`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/submit`, {
                 method: 'POST',
-                body: JSON.stringify(createEvent)
+                body: JSON.stringify(submitEvent)
             });
         });
 
@@ -64,12 +66,30 @@ describe('acceptance tests', () => {
     });
 
     it('should not let us attempt to ship before it is assigned', async () => {
-        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/shipped`, {
+        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
             method: 'POST',
             body: JSON.stringify({})
         });
 
         expect(response.status).toEqual(409);
+    });
+
+    describe('listing endpoint', () => {
+        let response;
+        let responseBody;
+
+        beforeAll(async () => {
+            response = await fetch(`${baseURL}/shipments`);
+            responseBody = response.ok && await response.json();
+        });
+
+        it('should return an ok response', () => {
+            expect(response.status).toEqual(200);
+        });
+
+        it('should return an array with at least one item', async () => {
+            expect(responseBody.length).toBeGreaterThan(0);
+        });
     });
 
     describe('assign shipment', () => {
@@ -102,7 +122,7 @@ describe('acceptance tests', () => {
         beforeAll(async () => {
             const shipEvent = {
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/shipped`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
                 method: 'POST',
                 body: JSON.stringify(shipEvent)
             });
