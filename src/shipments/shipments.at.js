@@ -1,6 +1,8 @@
 
 const shortid = require('shortid');
 const fetch = require('node-fetch');
+const Chance = require('chance');
+const chance = new Chance();
 const failFast = require('jasmine-fail-fast');
 // eslint-disable-next-line no-undef
 jasmine.getEnv().addReporter(failFast.init());
@@ -9,7 +11,7 @@ jest.setTimeout(50000);
 
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
-    const accountId = shortid.generate();
+    const accountId = `acc-${chance.character({alpha: true, casing: 'upper'})}`;
     const baseURL = 'http://localhost:3000';
 
     async function wait(ms) {
@@ -46,7 +48,7 @@ describe('acceptance tests', () => {
                     zip: '50309'
                 },
                 billToAccountId: accountId,
-                weightInPounds: 10
+                weightInPounds: chance.natural({min: 5, max: 50})
             };
             response = await fetch(`${baseURL}/shipments/${shipmentId}/events/submit`, {
                 method: 'POST',

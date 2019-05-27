@@ -35,12 +35,14 @@ async function init() {
         require('./shipments/events/setupSaveEventListener')(),
         require('./shipments/setupShipmentEventListener')(),
         require('./accounts/events/setupSaveEventListener')(),
-        require('./accounts/setupShipmentEventListener')()
+        require('./accounts/setupShipmentEventListener')(),
+        setupEventListener(require('./accounts/updateAccountEventHandler'))
     ]);
 
     server.route(require('./root'));
 
     server.route(require('./accounts/events/listEvents'));
+    server.route(require('./accounts/listAccountsHandler'));
     server.route(require('./accounts/events/payment/paymentHandler'));
     server.route(require('./shipments/listShipments'));
     server.route(require('./shipments/getShipmentById'));
