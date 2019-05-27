@@ -1,5 +1,5 @@
 
-const kafka = require('../configuredKafka');
+const kafka = require('./configuredKafka');
 
 module.exports = async function setupEventListener({groupId, topic, eachMessage}) {
     const consumer = kafka.consumer({ groupId });
