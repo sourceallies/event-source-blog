@@ -32,11 +32,11 @@ async function init() {
 
     await configuredKafka.producer.connect();
     await Promise.all([
-        require('./shipments/events/setupSaveEventListener')(),
-        require('./shipments/setupShipmentEventListener')(),
-        require('./accounts/events/setupSaveEventListener')(),
-        require('./accounts/setupShipmentEventListener')()
-    ]);
+        require('./accounts/events/saveEventListener'),
+        require('./accounts/events/shipment-invoice/invoiceShipmentEventListener'),
+        require('./shipments/events/saveEventsListener'),
+        require('./shipments/updateShipmentEventListener')
+    ].map(setupEventListener));
 
     server.route(require('./root'));
 
