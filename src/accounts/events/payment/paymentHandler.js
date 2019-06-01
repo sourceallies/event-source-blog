@@ -1,11 +1,13 @@
 const paymentEventSchema = require('./paymentEventSchema');
 const publishEvent = require('../publishEvent');
+const shortId = require('shortid');
 
 function buildEventToSend({payload, params}) {
     const accountId = params.accountId;
 
     return {
         ...payload,
+        _id: `payment:${shortId.generate()}`,
         accountId,
         eventType: 'payment'
     };

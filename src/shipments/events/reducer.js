@@ -4,7 +4,7 @@ const reducersByEventType = {
     assign: require('./assign/assignEventReducer'),
     ship: require('./ship/shipEventReducer'),
     deliver: require('./deliver/deliverEventReducer'),
-    'reverse-event': require('./reverse-event/reverseEventReducer')
+    tombstone: require('./tombstone/tombstoneEventReducer')
 };
 
 module.exports = function shipmentEventReducer(shipment, event) {
