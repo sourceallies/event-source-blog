@@ -229,7 +229,7 @@ describe('acceptance tests', () => {
 
             beforeAll(async () => {
                 const response = await fetch(`${baseURL}/accounts/${accountId}`);
-                accountBeforePublish = response.ok && await response.json();
+                account = response.ok && await response.json();
             });
 
             it('should have the same balance as before', () => {
