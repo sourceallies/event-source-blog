@@ -32,6 +32,7 @@ async function init() {
 
     await configuredKafka.producer.connect();
     await Promise.all([
+        require('./accounts/updateAccountEventHandler'),
         require('./accounts/events/saveEventListener'),
         require('./accounts/events/shipment-invoice/invoiceShipmentEventListener'),
         require('./shipments/events/saveEventsListener'),
@@ -41,6 +42,7 @@ async function init() {
     server.route(require('./root'));
 
     server.route(require('./accounts/events/listEvents'));
+    server.route(require('./accounts/listAccountsHandler'));
     server.route(require('./accounts/events/payment/paymentHandler'));
     server.route(require('./shipments/listShipments'));
     server.route(require('./shipments/getShipmentById'));
