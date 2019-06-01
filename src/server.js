@@ -4,6 +4,7 @@ require('dotenv-flow').config();
 const {Server} = require('hapi');
 const mongoClient = require('./configuredMongoClient');
 const configuredKafka = require('./configuredKafka');
+const setupEventListener = require('./setupEventListener');
 
 function logRequestEvent(_request, {tags, data}) {
     console.log(tags, data);
@@ -31,11 +32,11 @@ async function init() {
 
     await configuredKafka.producer.connect();
     await Promise.all([
-        require('./shipments/events/setupSaveEventListener')(),
-        require('./shipments/setupShipmentEventListener')(),
-        require('./accounts/events/setupSaveEventListener')(),
-        require('./accounts/setupShipmentEventListener')()
-    ]);
+        require('./accounts/events/saveEventListener'),
+        require('./accounts/events/shipment-invoice/invoiceShipmentEventListener'),
+        require('./shipments/events/saveEventsListener'),
+        require('./shipments/updateShipmentEventListener')
+    ].map(setupEventListener));
 
     server.route(require('./root'));
 

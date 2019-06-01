@@ -1,7 +1,6 @@
 
-const kafka = require('../configuredKafka');
-const publishEvent = require('./events/publishEvent');
-const loadShipment = require('../shipments/loadShipment');
+const publishEvent = require('../publishEvent');
+const loadShipment = require('../../../shipments/loadShipment');
 
 async function publishInvoiceEvent(shipmentEvent) {
     const {shipmentId} = shipmentEvent;
@@ -27,9 +26,8 @@ async function eachMessage({ message }) {
     }
 }
 
-module.exports = async function setupShipmentEventListener() {
-    const consumer = kafka.consumer({ groupId: 'accounts-shipment-events' });
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'shipment-events' });
-    await consumer.run({eachMessage});
+module.exports = {
+    groupId: 'accounts-shipment-events',
+    topic: 'shipment-events',
+    eachMessage
 };

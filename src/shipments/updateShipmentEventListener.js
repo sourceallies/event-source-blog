@@ -1,7 +1,6 @@
 
 const shipmentEventReducer = require('./events/reducer');
 const mongoClient = require('../configuredMongoClient');
-const kafka = require('../configuredKafka');
 const IllegalShipmentStateError = require('./events/IllegalShipmentStateError');
 const publishEvent = require('./events/publishEvent');
 const loadShipment = require('./loadShipment');
@@ -60,9 +59,8 @@ async function eachMessage({ message }) {
     }
 }
 
-module.exports = async function setupShipmentEventListener() {
-    const consumer = kafka.consumer({ groupId: 'shipment-events-to-shipment' });
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'shipment-events' });
-    await consumer.run({eachMessage});
+module.exports = {
+    groupId: 'shipment-events-to-shipment',
+    topic: 'shipment-events',
+    eachMessage
 };

@@ -1,6 +1,5 @@
 
 const mongoClient = require('../../configuredMongoClient');
-const kafka = require('../../configuredKafka');
 
 function getEventFromMessage({value, timestamp}) {
     const eventTimestamp = new Date(+timestamp).toISOString();
@@ -28,9 +27,8 @@ async function eachMessage({ message }) {
         );
 }
 
-module.exports = async function setupSaveEventListener() {
-    const consumer = kafka.consumer({ groupId: 'account-events-persist' });
-    await consumer.connect();
-    await consumer.subscribe({ topic: 'account-events' });
-    await consumer.run({eachMessage});
+module.exports = {
+    groupId: 'account-events-persist',
+    topic: 'account-events',
+    eachMessage
 };
