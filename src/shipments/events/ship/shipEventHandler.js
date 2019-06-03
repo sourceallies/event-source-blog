@@ -2,12 +2,14 @@ const shipEventSchema = require('./shipEventSchema');
 const publishEvent = require('../publishEvent');
 const loadShipment = require('../../loadShipment');
 const shippedEventReducer = require('./shipEventReducer');
+const shortid = require('shortid');
 
 function buildEventToSave({payload, params}) {
     const shipmentId = params.shipmentId;
 
     return {
         ...payload,
+        _id: shortid.generate(),
         shipmentId,
         eventType: 'ship'
     };

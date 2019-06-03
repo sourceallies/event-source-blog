@@ -12,17 +12,14 @@ function getEventFromMessage({value, timestamp}) {
 async function eachMessage({ message }) {
     const event = getEventFromMessage(message);
     console.log('Got event: ', event);
+    const _id = event._id;
 
-    const _id = `${event.shipmentId}-${event.eventTimestamp}`;
     await mongoClient
         .db('shipment')
         .collection('shipment_events')
         .replaceOne(
             {_id},
-            {
-                ...event,
-                _id
-            },
+            event,
             {upsert: true}
         );
 }

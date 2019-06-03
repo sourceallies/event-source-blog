@@ -3,12 +3,14 @@ const publishEvent = require('../publishEvent');
 const loadShipment = require('../../loadShipment');
 const submitEventReducer = require('./submitEventReducer');
 const calculateCost = require('./calculateCost');
+const shortid = require('shortid');
 
 function buildEventToSend({payload, params}) {
     const shipmentId = params.shipmentId;
 
     return {
         ...payload,
+        _id: shortid.generate(),
         shipmentId,
         eventType: 'submit',
         cost: calculateCost(payload)

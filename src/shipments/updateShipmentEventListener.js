@@ -14,7 +14,7 @@ async function saveShipment(shipment) {
 
 async function tombstoneEvent(event) {
     const reversalEvent = {
-        id: `tombstone:${event.id}`,
+        _id: `tombstone:${event._id}`,
         shipmentId: event.shipmentId,
         eventType: 'tombstone',
         reversedEvent: event

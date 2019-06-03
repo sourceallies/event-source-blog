@@ -165,7 +165,7 @@ describe('acceptance tests', () => {
         });
     });
 
-    describe.skip('invoice the billTo account', () => {
+    describe('invoice the billTo account', () => {
         let response;
         let accountEvents;
 
@@ -190,17 +190,16 @@ describe('acceptance tests', () => {
         let accountBeforePublish;
 
         beforeAll(async () => {
-            // const response = await fetch(`${baseURL}/accounts/${accountId}`);
-            // if (!response.ok) {
-            //     throw new Error(`${response.status}: ${await response.text()}`);
-            // }
-            // accountBeforePublish = await response.json();
+            const response = await fetch(`${baseURL}/accounts/${accountId}`);
+            if (!response.ok) {
+                throw new Error(`${response.status}: ${await response.text()}`);
+            }
+            accountBeforePublish = await response.json();
 
             await publishShipmentEvent({
                 shipmentId,
                 eventType: 'deliver',
-                _id: shortid.generate(),
-                fromAT: true
+                _id: shortid.generate()
             });
         });
 
