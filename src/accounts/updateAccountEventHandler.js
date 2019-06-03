@@ -17,17 +17,18 @@ function getEventFromMessage({value, timestamp}) {
     };
 }
 
-function eventAlreadyProcessed(account, eventTimestamp) {
+function eventAlreadyProcessed(account, event) {
+    const {_id} = event;
     return account &&
-        account.lastEventTimestamp &&
-        Date.parse(account.lastEventTimestamp) >= eventTimestamp;
+        account.processedEventIds &&
+        account.processedEventIds.includes(_id);
 }
 
 async function eachMessage({ message }) {
     const event = getEventFromMessage(message);
 
     const loadedAccount = await getAccountById(event.accountId);
-    if (eventAlreadyProcessed(loadedAccount, message.timestamp)) {
+    if (eventAlreadyProcessed(loadedAccount, event)) {
         return;
     }
     const updatedAccount = accountEventReducer(loadedAccount, event);

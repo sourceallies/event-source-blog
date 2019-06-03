@@ -1,6 +1,5 @@
 
 const mongoClient = require('../../configuredMongoClient');
-const publishEvent = require('./publishEvent');
 
 function getEventFromMessage({value, timestamp}) {
     const eventTimestamp = new Date(+timestamp).toISOString();
@@ -20,10 +19,7 @@ async function trySave(event) {
                 _id,
                 eventTimestamp
             },
-            {
-                ...event,
-                _id
-            },
+            event,
             {upsert: true}
         );
 }
@@ -32,30 +28,14 @@ function isDuplicateTransactionError(e) {
     return e.name === 'MongoError' && e.code === 11000;
 }
 
-async function tombstoneEvent(event) {
-    const eventTimestamp = new Date(Date.now()).toISOString();
-    const tombstone = {
-        accountId: event.accountId,
-        eventTimestamp,
-        eventType: 'tombstone',
-        reversedEvent: event
-    };
-    await publishEvent(tombstone);
-}
-
 async function eachMessage({ message }) {
     const event = getEventFromMessage(message);
-    console.log('Got event: ', event);
-    if (event.eventType === 'tombstone') {
-        return;
-    }
+    console.log('Got account event: ', event);
 
     try {
         await trySave(event);
     } catch (e) {
-        if (isDuplicateTransactionError(e)) {
-            tombstoneEvent(event);
-        } else {
+        if (!isDuplicateTransactionError(e)) {
             throw e;
         }
     }
