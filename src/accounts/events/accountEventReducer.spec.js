@@ -6,6 +6,7 @@ describe('Account event reducer', () => {
 
     beforeEach(() => {
         event = {
+            _id: 'ev123',
             accountId: 'acc123',
             eventTimestamp: '2019-02-03T10:00:00.000Z',
             amount: -10
@@ -30,6 +31,10 @@ describe('Account event reducer', () => {
         it('should set lastEventTimestamp', () => {
             expect(resultingAccount.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
         });
+
+        it('should initialize the processedEventIds array', () => {
+            expect(resultingAccount.processedEventIds).toEqual(['ev123']);
+        });
     });
 
     describe('Account exists with a balance', () => {
@@ -37,6 +42,7 @@ describe('Account event reducer', () => {
 
         beforeEach(() => {
             resultingAccount = accountEventReducer({
+                processedEventIds: ['ev000'],
                 balance: 20
             }, event);
         });
@@ -48,60 +54,9 @@ describe('Account event reducer', () => {
         it('should set lastEventTimestamp', () => {
             expect(resultingAccount.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
         });
-    });
 
-    describe('Tombstone previous event', () => {
-        let resultingAccount;
-
-        beforeEach(() => {
-            event = {
-                accountId: 'acc123',
-                eventTimestamp: '2019-02-03T10:00:00.000Z',
-                eventType: 'tombstone',
-                reversedEvent: {
-                    eventTimestamp: '2019-02-02T10:00:00.000Z',
-                    amount: -10
-                }
-            };
-
-            resultingAccount = accountEventReducer({
-                balance: 20
-            }, event);
-        });
-
-        it('should reverse the balance change', () => {
-            expect(resultingAccount.balance).toEqual(30);
-        });
-
-        it('should track that the event was tombstoned', () => {
-            expect(resultingAccount.tombstonedEventTimestamps).toContainEqual('2019-02-02T10:00:00.000Z');
-        });
-    });
-
-    describe('Duplicate tombstone previous event', () => {
-        let resultingAccount;
-
-        beforeEach(() => {
-            event = {
-                accountId: 'acc123',
-                eventTimestamp: '2019-02-03T10:00:00.000Z',
-                eventType: 'tombstone',
-                reversedEvent: {
-                    eventTimestamp: '2019-02-02T10:00:00.000Z',
-                    amount: -10
-                }
-            };
-
-            resultingAccount = accountEventReducer({
-                tombstonedEventTimestamps: [
-                    '2019-02-02T10:00:00.000Z'
-                ],
-                balance: 20
-            }, event);
-        });
-
-        it('should not reverse the balance change', () => {
-            expect(resultingAccount.balance).toEqual(20);
+        it('should append the processedEventIds array', () => {
+            expect(resultingAccount.processedEventIds).toEqual(['ev123', 'ev000']);
         });
     });
 });
