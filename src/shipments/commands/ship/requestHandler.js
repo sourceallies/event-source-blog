@@ -1,5 +1,5 @@
 const schema = require('./schema');
-const publish = require('../publishEvent');
+const publish = require('../publish');
 const loadShipment = require('../../loadShipment');
 const reducer = require('./reducer');
 

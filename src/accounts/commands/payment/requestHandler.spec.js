@@ -2,30 +2,30 @@
 const {Server} = require('hapi');
 const MockDate = require('mockdate');
 
-jest.mock('../publishEvent', () => jest.fn());
-const publishEvent = require('../publishEvent');
+jest.mock('../publish', () => jest.fn());
+const publishCommand = require('../publish');
 
-jest.mock('./paymentEventSchema', () => {
+jest.mock('./schema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const paymentEventSchema = require('./paymentEventSchema');
+const schema = require('./schema');
 
-describe('Payment event handler', () => {
+describe('Payment handler', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        paymentEventSchema._validateWithOptions.mockImplementation((value) => value);
+        schema._validateWithOptions.mockImplementation((value) => value);
 
         server = new Server();
-        server.route(require('./paymentHandler'));
-        publishEvent.mockResolvedValue();
+        server.route(require('./requestHandler'));
+        publishCommand.mockResolvedValue();
 
         request = {
-            url: '/accounts/acc123/events/payment',
+            url: '/accounts/acc123/commands/payment',
             method: 'POST',
             payload: {
                 amount: 20
@@ -37,7 +37,7 @@ describe('Payment event handler', () => {
         MockDate.reset();
     });
 
-    describe('A valid payment event is received', () => {
+    describe('A valid payment command is received', () => {
         let response;
         beforeEach(async () => {
             MockDate.set('2019-03-04T02:30:45.000Z');
@@ -48,19 +48,19 @@ describe('Payment event handler', () => {
             expect(response.statusCode).toEqual(202);
         });
 
-        it('should send a payment event to the account-events topic', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
+        it('should send a payment command to the account-commands topic', () => {
+            expect(publishCommand).toHaveBeenCalledWith(expect.objectContaining({
                 accountId: 'acc123',
-                eventType: 'payment',
+                type: 'payment',
                 amount: 20
             }));
         });
     });
 
-    describe('An invalid event is received', () => {
+    describe('An invalid command is received', () => {
         let response;
         beforeEach(async () => {
-            paymentEventSchema._validateWithOptions.mockImplementation(() => {
+            schema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);
@@ -70,8 +70,8 @@ describe('Payment event handler', () => {
             expect(response.statusCode).toEqual(400);
         });
 
-        it('should not send the event', () => {
-            expect(publishEvent).not.toHaveBeenCalled();
+        it('should not send the command', () => {
+            expect(publishCommand).not.toHaveBeenCalled();
         });
     });
 });

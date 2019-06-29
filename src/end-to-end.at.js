@@ -2,7 +2,7 @@
 const shortid = require('shortid');
 const fetch = require('node-fetch');
 const failFast = require('jasmine-fail-fast');
-const publishShipmentCommand = require('./shipments/commands/publishCommand');
+const publishShipmentCommand = require('./shipments/commands/publish');
 const Chance = require('chance');
 const chance = new Chance();
 // eslint-disable-next-line no-undef
@@ -12,6 +12,7 @@ jest.setTimeout(50000);
 
 describe('acceptance tests', () => {
     const shipmentId = shortid.generate();
+    console.log('using shipmentId: ', shipmentId);
     const accountId = `acc-${chance.character({alpha: true, casing: 'upper'})}`;
     const baseURL = 'http://localhost:3000';
 
@@ -26,7 +27,7 @@ describe('acceptance tests', () => {
         }
         const txt = await response.text();
         console.error(txt);
-        throw new Error(`${response.statusCode}: ${txt}`);
+        throw new Error(`${response.status}: ${txt}`);
     }
 
     describe('submit', () => {

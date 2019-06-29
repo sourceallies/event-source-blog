@@ -1,5 +1,5 @@
 
-const accountEventReducer = require('./accountEventReducer');
+const reducer = require('./reducer');
 
 describe('Account event reducer', () => {
     let event;
@@ -16,7 +16,7 @@ describe('Account event reducer', () => {
         let resultingAccount;
 
         beforeEach(() => {
-            resultingAccount = accountEventReducer(undefined, event);
+            resultingAccount = reducer(undefined, event);
         });
 
         it('should set the _id', () => {
@@ -36,7 +36,7 @@ describe('Account event reducer', () => {
         let resultingAccount;
 
         beforeEach(() => {
-            resultingAccount = accountEventReducer({
+            resultingAccount = reducer({
                 balance: 20
             }, event);
         });
@@ -64,7 +64,7 @@ describe('Account event reducer', () => {
                 }
             };
 
-            resultingAccount = accountEventReducer({
+            resultingAccount = reducer({
                 balance: 20
             }, event);
         });
@@ -92,7 +92,7 @@ describe('Account event reducer', () => {
                 }
             };
 
-            resultingAccount = accountEventReducer({
+            resultingAccount = reducer({
                 tombstonedEventTimestamps: [
                     '2019-02-02T10:00:00.000Z'
                 ],

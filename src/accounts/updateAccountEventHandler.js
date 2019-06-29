@@ -1,4 +1,4 @@
-const accountEventReducer = require('./events/accountEventReducer');
+const accountEventReducer = require('./events/reducer');
 const mongoClient = require('../configuredMongoClient');
 const getAccountById = require('./getAccountById');
 
@@ -9,22 +9,14 @@ async function saveAccount(account) {
         .replaceOne({_id}, account, {upsert: true});
 }
 
-function getEventFromMessage({value, timestamp}) {
-    const eventTimestamp = new Date(+timestamp).toISOString();
-    return {
-        ...JSON.parse(value),
-        eventTimestamp
-    };
-}
-
-function eventAlreadyProcessed(account, eventTimestamp) {
+function eventAlreadyProcessed(account, timestamp) {
     return account &&
         account.lastEventTimestamp &&
-        Date.parse(account.lastEventTimestamp) >= eventTimestamp;
+        Date.parse(account.lastEventTimestamp) >= timestamp;
 }
 
 async function eachMessage({ message }) {
-    const event = getEventFromMessage(message);
+    const event = JSON.parse(message.value);
 
     const loadedAccount = await getAccountById(event.accountId);
     if (eventAlreadyProcessed(loadedAccount, message.timestamp)) {
