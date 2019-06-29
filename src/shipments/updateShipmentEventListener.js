@@ -1,8 +1,8 @@
 
-const shipmentEventReducer = require('./events/reducer');
+const shipmentEventReducer = require('./commands/reducer');
 const mongoClient = require('../configuredMongoClient');
 const IllegalShipmentStateError = require('./events/IllegalShipmentStateError');
-const publishEvent = require('./events/publishEvent');
+const publishEvent = require('./events/publish');
 const loadShipment = require('./loadShipment');
 
 async function saveShipment(shipment) {
