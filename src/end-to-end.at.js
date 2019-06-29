@@ -2,7 +2,7 @@
 const shortid = require('shortid');
 const fetch = require('node-fetch');
 const failFast = require('jasmine-fail-fast');
-const publishShipmentEvent = require('./shipments/events/publishEvent');
+const publishShipmentCommand = require('./shipments/commands/publishCommand');
 const Chance = require('chance');
 const chance = new Chance();
 // eslint-disable-next-line no-undef
@@ -29,11 +29,11 @@ describe('acceptance tests', () => {
         throw new Error(`${response.statusCode}: ${txt}`);
     }
 
-    describe('submit event', () => {
+    describe('submit', () => {
         let response;
 
         beforeAll(async () => {
-            const submitEvent = {
+            const submitCommand = {
                 shipFrom: {
                     name: 'Source Allies',
                     line1: '4501 NW Urbandale Dr',
@@ -51,9 +51,9 @@ describe('acceptance tests', () => {
                 billToAccountId: accountId,
                 weightInPounds: chance.natural({min: 5, max: 50})
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/submit`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/commands/submit`, {
                 method: 'POST',
-                body: JSON.stringify(submitEvent)
+                body: JSON.stringify(submitCommand)
             });
         });
 
@@ -69,7 +69,7 @@ describe('acceptance tests', () => {
     });
 
     it('should not let us attempt to ship before it is assigned', async () => {
-        const response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
+        const response = await fetch(`${baseURL}/shipments/${shipmentId}/commands/ship`, {
             method: 'POST',
             body: JSON.stringify({})
         });
@@ -99,12 +99,12 @@ describe('acceptance tests', () => {
         let response;
 
         beforeAll(async () => {
-            const assignEvent = {
+            const assignCommand = {
                 truckId: 't1'
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/assign`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/commands/assign`, {
                 method: 'POST',
-                body: JSON.stringify(assignEvent)
+                body: JSON.stringify(assignCommand)
             });
         });
 
@@ -119,15 +119,15 @@ describe('acceptance tests', () => {
         });
     });
 
-    describe('ship event', () => {
+    describe('ship', () => {
         let response;
 
         beforeAll(async () => {
-            const shipEvent = {
+            const shipCommand = {
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/ship`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/commands/ship`, {
                 method: 'POST',
-                body: JSON.stringify(shipEvent)
+                body: JSON.stringify(shipCommand)
             });
         });
 
@@ -142,15 +142,15 @@ describe('acceptance tests', () => {
         });
     });
 
-    describe('deliver event', () => {
+    describe('deliver', () => {
         let response;
 
         beforeAll(async () => {
-            const deliveredEvent = {
+            const deliveredCommand = {
             };
-            response = await fetch(`${baseURL}/shipments/${shipmentId}/events/deliver`, {
+            response = await fetch(`${baseURL}/shipments/${shipmentId}/commands/deliver`, {
                 method: 'POST',
-                body: JSON.stringify(deliveredEvent)
+                body: JSON.stringify(deliveredCommand)
             });
         });
 
@@ -196,7 +196,7 @@ describe('acceptance tests', () => {
             }
             accountBeforePublish = await response.json();
 
-            await publishShipmentEvent({
+            await publishShipmentCommand({
                 shipmentId,
                 eventType: 'deliver'
             });
@@ -211,16 +211,10 @@ describe('acceptance tests', () => {
                 shipmentEvents = response.ok && await response.json();
             });
 
-            it('should have 2 deliver events', () => {
+            it('should have 1 deliver events', () => {
                 const deliverEvents = shipmentEvents
                     .filter((event) => event.eventType === 'deliver');
-                expect(deliverEvents).toHaveLength(2);
-            });
-
-            it('should have a tombstone for the duplicate shipment event', () => {
-                const tombstoneEvents = shipmentEvents
-                    .filter((event) => event.eventType === 'tombstone');
-                expect(tombstoneEvents).toHaveLength(1);
+                expect(deliverEvents).toHaveLength(1);
             });
         });
 
