@@ -2,16 +2,16 @@
 const {Server} = require('hapi');
 const MockDate = require('mockdate');
 
-jest.mock('../publishEvent', () => jest.fn());
-const publishEvent = require('../publishEvent');
+jest.mock('../publish', () => jest.fn());
+const publishCommand = require('../publish');
 
-jest.mock('./submitEventSchema', () => {
+jest.mock('./schema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const submitEventSchema = require('./submitEventSchema');
+const schema = require('./schema');
 
 jest.mock('../../loadShipment', () => jest.fn());
 const loadShipment = require('../../loadShipment');
@@ -19,24 +19,24 @@ const loadShipment = require('../../loadShipment');
 jest.mock('./calculateCost', () => jest.fn());
 const calculateCost = require('./calculateCost');
 
-jest.mock('./submitEventReducer', () => jest.fn());
+jest.mock('./reducer', () => jest.fn());
 
-describe('Post shipment', () => {
+describe('Submit shipment', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        submitEventSchema._validateWithOptions.mockImplementation((value) => value);
+        schema._validateWithOptions.mockImplementation((value) => value);
         loadShipment.mockResolvedValue();
 
         server = new Server();
-        server.route(require('./submitEventHandler'));
-        publishEvent.mockResolvedValue();
+        server.route(require('./requestHandler'));
+        publishCommand.mockResolvedValue();
 
         calculateCost.mockReturnValue(50);
 
         request = {
-            url: '/shipments/ship1234/events/submit',
+            url: '/shipments/ship1234/commands/submit',
             method: 'POST',
             payload: {
                 weightInPounds: 20
@@ -48,7 +48,7 @@ describe('Post shipment', () => {
         MockDate.reset();
     });
 
-    describe('A valid submit event is received', () => {
+    describe('A valid submit command is received', () => {
         let response;
         beforeEach(async () => {
             MockDate.set('2019-03-04T02:30:45.000Z');
@@ -63,25 +63,25 @@ describe('Post shipment', () => {
             expect(calculateCost).toHaveBeenCalledWith(request.payload);
         });
 
-        it('should send a submit event to the shipment-events topic', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
+        it('should send a submit command to the shipment-commands topic', () => {
+            expect(publishCommand).toHaveBeenCalledWith(expect.objectContaining({
                 shipmentId: 'ship1234',
-                eventType: 'submit',
+                type: 'submit',
                 weightInPounds: 20
             }));
         });
 
         it('should set the cost', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
+            expect(publishCommand).toHaveBeenCalledWith(expect.objectContaining({
                 cost: 50
             }));
         });
     });
 
-    describe('An invalid event is received', () => {
+    describe('An invalid command is received', () => {
         let response;
         beforeEach(async () => {
-            submitEventSchema._validateWithOptions.mockImplementation(() => {
+            schema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);
@@ -91,8 +91,8 @@ describe('Post shipment', () => {
             expect(response.statusCode).toEqual(400);
         });
 
-        it('should not send the event', () => {
-            expect(publishEvent).not.toHaveBeenCalled();
+        it('should not send the command', () => {
+            expect(publishCommand).not.toHaveBeenCalled();
         });
     });
 });

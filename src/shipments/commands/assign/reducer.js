@@ -13,11 +13,11 @@ function validateShipment(shipment, assignEvent) {
 
 module.exports = function assignEventReducer(shipment, assignEvent) {
     validateShipment(shipment, assignEvent);
-    const {truckId, eventTimestamp} = assignEvent;
+    const {truckId, timestamp} = assignEvent;
     return {
         ...shipment,
         status: 'Assigned',
         assignedToTruck: truckId,
-        lastEventTimestamp: eventTimestamp,
+        lastCommandTimestamp: timestamp,
     };
 };

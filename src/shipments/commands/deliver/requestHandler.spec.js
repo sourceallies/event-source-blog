@@ -1,43 +1,43 @@
 
 const {Server} = require('hapi');
 
-jest.mock('../publishEvent', () => jest.fn());
-const publishEvent = require('../publishEvent');
+jest.mock('../publish', () => jest.fn());
+const publish = require('../publish');
 
-jest.mock('./deliverEventSchema', () => {
+jest.mock('./schema', () => {
     return {
         _validateWithOptions: jest.fn(),
         isJoi: true
     };
 });
-const deliverEventSchema = require('./deliverEventSchema');
+const schema = require('./schema');
 
 jest.mock('../../loadShipment', () => jest.fn());
 const loadShipment = require('../../loadShipment');
 
-jest.mock('./deliverEventReducer', () => jest.fn());
+jest.mock('./reducer', () => jest.fn());
 
 describe('Deliver shipment', () => {
     let server;
     let request;
 
     beforeEach(() => {
-        deliverEventSchema._validateWithOptions.mockImplementation((value) => value);
+        schema._validateWithOptions.mockImplementation((value) => value);
         loadShipment.mockResolvedValue({});
 
         server = new Server();
-        server.route(require('./deliverEventHandler'));
-        publishEvent.mockResolvedValue();
+        server.route(require('./requestHandler'));
+        publish.mockResolvedValue();
 
         request = {
-            url: '/shipments/ship1234/events/deliver',
+            url: '/shipments/ship1234/commands/deliver',
             method: 'POST',
             payload: {
             }
         };
     });
 
-    describe('A valid deliver event is received', () => {
+    describe('A valid deliver command is received', () => {
         let response;
         beforeEach(async () => {
             response = await server.inject(request);
@@ -47,18 +47,18 @@ describe('Deliver shipment', () => {
             expect(response.statusCode).toEqual(202);
         });
 
-        it('should send a deliver event to the shipment-events topic', () => {
-            expect(publishEvent).toHaveBeenCalledWith(expect.objectContaining({
+        it('should send a deliver command to the shipment-commands topic', () => {
+            expect(publish).toHaveBeenCalledWith(expect.objectContaining({
                 shipmentId: 'ship1234',
-                eventType: 'deliver'
+                type: 'deliver'
             }));
         });
     });
 
-    describe('An invalid event is received', () => {
+    describe('An invalid command is received', () => {
         let response;
         beforeEach(async () => {
-            deliverEventSchema._validateWithOptions.mockImplementation(() => {
+            schema._validateWithOptions.mockImplementation(() => {
                 throw new Error();
             });
             response = await server.inject(request);
@@ -69,7 +69,7 @@ describe('Deliver shipment', () => {
         });
 
         it('should not send the event', () => {
-            expect(publishEvent).not.toHaveBeenCalled();
+            expect(publish).not.toHaveBeenCalled();
         });
     });
 });

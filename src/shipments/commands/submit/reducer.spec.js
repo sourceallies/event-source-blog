@@ -1,15 +1,15 @@
 
 const IllegalShipmentStateError = require('../IllegalShipmentStateError');
-const createEventReducer = require('./submitEventReducer');
+const reducer = require('./reducer');
 
-describe('submit event reducer', () => {
-    let event;
+describe('submit reducer', () => {
+    let command;
 
     beforeEach(() => {
-        event = {
+        command = {
             shipmentId: 'ship123',
-            eventTimestamp: '2019-02-03T10:00:00.000Z',
-            eventType: 'create',
+            timestamp: '2019-02-03T10:00:00.000Z',
+            type: 'submit',
             shipFrom: {
                 name: 'Bill',
                 line1: '123 Main st',
@@ -35,7 +35,7 @@ describe('submit event reducer', () => {
         let resultingShipment;
 
         beforeEach(() => {
-            resultingShipment = createEventReducer(null, event);
+            resultingShipment = reducer(null, command);
         });
 
         it('should set the _id to the shipmentId', () => {
@@ -46,16 +46,16 @@ describe('submit event reducer', () => {
             expect(resultingShipment.status).toEqual('Submitted');
         });
 
-        it('should set the createdTimestamp to the eventTimestamp', () => {
+        it('should set the createdTimestamp to the timestamp', () => {
             expect(resultingShipment.createdTimestamp).toEqual('2019-02-03T10:00:00.000Z');
         });
 
         it('should copy over the shipFrom address', () => {
-            expect(resultingShipment.shipFrom).toEqual(event.shipFrom);
+            expect(resultingShipment.shipFrom).toEqual(command.shipFrom);
         });
 
         it('should copy over the shipTo address', () => {
-            expect(resultingShipment.shipTo).toEqual(event.shipTo);
+            expect(resultingShipment.shipTo).toEqual(command.shipTo);
         });
 
         it('should copy over the weightInPounds', () => {
@@ -70,14 +70,14 @@ describe('submit event reducer', () => {
             expect(resultingShipment.billToAccountId).toEqual('acc123');
         });
 
-        it('should set lastEventTimestamp', () => {
-            expect(resultingShipment.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
+        it('should set lastCommandTimestamp', () => {
+            expect(resultingShipment.lastCommandTimestamp).toEqual('2019-02-03T10:00:00.000Z');
         });
     });
 
     describe('shipment already exists', () => {
         it('should throw an error', () => {
-            expect(() => createEventReducer({}, event)).toThrow(IllegalShipmentStateError);
+            expect(() => reducer({}, command)).toThrow(IllegalShipmentStateError);
         });
     });
 });

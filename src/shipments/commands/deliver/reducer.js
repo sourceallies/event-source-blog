@@ -17,12 +17,12 @@ function validateShipment(shipment) {
     }
 }
 
-module.exports = function deliverEventReducer(shipment, deliverEvent) {
+module.exports = function deliverCommandReducer(shipment, command) {
     validateShipment(shipment);
 
     return {
         ...shipment,
         status: 'Delivered',
-        lastEventTimestamp: deliverEvent.eventTimestamp
+        lastCommandTimestamp: command.timestamp
     };
 };

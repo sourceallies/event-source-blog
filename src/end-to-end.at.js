@@ -198,7 +198,7 @@ describe('acceptance tests', () => {
 
             await publishShipmentCommand({
                 shipmentId,
-                eventType: 'deliver'
+                type: 'deliver'
             });
         });
 
@@ -213,7 +213,7 @@ describe('acceptance tests', () => {
 
             it('should have 1 deliver events', () => {
                 const deliverEvents = shipmentEvents
-                    .filter((event) => event.eventType === 'deliver');
+                    .filter((event) => event.type === 'deliver');
                 expect(deliverEvents).toHaveLength(1);
             });
         });

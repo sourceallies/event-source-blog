@@ -1,9 +1,9 @@
 const IllegalShipmentStateError = require('../IllegalShipmentStateError');
 const chance = new (require('chance').Chance)();
-const deliverEventReducer = require('./deliverEventReducer');
+const reducer = require('./reducer');
 
 describe('deliver event reducer', () => {
-    let event;
+    let command;
     let shipment;
 
     beforeEach(() => {
@@ -11,10 +11,10 @@ describe('deliver event reducer', () => {
             status: 'Shipped'
         };
 
-        event = {
+        command = {
             shipmentId: 'ship123',
-            eventTimestamp: '2019-02-03T10:00:00.000Z',
-            eventType: 'deliver',
+            timestamp: '2019-02-03T10:00:00.000Z',
+            type: 'deliver',
         };
     });
 
@@ -25,7 +25,7 @@ describe('deliver event reducer', () => {
         beforeEach(() => {
             randomFieldName = chance.word();
             shipment[randomFieldName] = randomFieldName;
-            resultingShipment = deliverEventReducer(shipment, event);
+            resultingShipment = reducer(shipment, command);
         });
 
         it('should set the status to Delivered', () => {
@@ -36,14 +36,14 @@ describe('deliver event reducer', () => {
             expect(resultingShipment).toHaveProperty(randomFieldName, randomFieldName);
         });
 
-        it('should set lastEventTimestamp', () => {
-            expect(resultingShipment.lastEventTimestamp).toEqual('2019-02-03T10:00:00.000Z');
+        it('should set lastCommandTimestamp', () => {
+            expect(resultingShipment.lastCommandTimestamp).toEqual('2019-02-03T10:00:00.000Z');
         });
     });
 
     describe('shipment does not exist', () => {
         it('should throw an error', () => {
-            expect(() => deliverEventReducer(undefined, event)).toThrow(IllegalShipmentStateError);
+            expect(() => reducer(undefined, command)).toThrow(IllegalShipmentStateError);
         });
     });
 
@@ -58,7 +58,7 @@ describe('deliver event reducer', () => {
         });
 
         it('should throw an error', () => {
-            expect(() => deliverEventReducer(undefined, event)).toThrow(IllegalShipmentStateError);
+            expect(() => reducer(undefined, command)).toThrow(IllegalShipmentStateError);
         });
     });
 });
