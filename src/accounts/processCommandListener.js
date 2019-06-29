@@ -35,7 +35,7 @@ async function eachMessage({ message }) {
 }
 
 module.exports = {
-    groupId: 'process-commands',
+    groupId: 'process-account-commands',
     topic: 'account-commands',
     eachMessage
 };

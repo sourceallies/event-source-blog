@@ -1,5 +1,5 @@
 
-const publishEvent = require('./commands/publish');
+const publish = require('./commands/publish');
 const loadShipment = require('../shipments/loadShipment');
 
 async function publishTransactionCommand(deliveryEvent) {
@@ -12,7 +12,7 @@ async function publishTransactionCommand(deliveryEvent) {
         amount: -1 * cost,
         shipmentId,
     };
-    await publishEvent(command);
+    await publish(command);
     console.log('published debit command for delivery', command);
 }
 
