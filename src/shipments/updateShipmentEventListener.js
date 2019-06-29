@@ -12,13 +12,13 @@ async function saveShipment(shipment) {
         .replaceOne({_id}, shipment, {upsert: true});
 }
 
-async function reverseEvent(event) {
+async function tombstoneEvent(event) {
     const eventTimestamp = new Date(Date.now()).toISOString();
     const reversalEvent = {
         _id: `${event.shipmentId}-${eventTimestamp}`,
         shipmentId: event.shipmentId,
         eventTimestamp,
-        eventType: 'reverse-event',
+        eventType: 'tombstone',
         reversedEvent: event
     };
     await publishEvent(reversalEvent);
@@ -51,7 +51,7 @@ async function eachMessage({ message }) {
         console.log('updated shipment: ', updatedShipment);
     } catch (e) {
         if (e instanceof IllegalShipmentStateError) {
-            await reverseEvent(event);
+            await tombstoneEvent(event);
             console.warn('Cannot reduce event ' + e);
         } else {
             throw e;

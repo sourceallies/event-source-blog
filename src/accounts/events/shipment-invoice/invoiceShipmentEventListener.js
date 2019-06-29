@@ -6,6 +6,7 @@ async function publishInvoiceEvent(shipmentEvent) {
     const {shipmentId} = shipmentEvent;
     const {billToAccountId, cost} = await loadShipment(shipmentId);
     const invoiceEvent = {
+        _id: `shipment-invoice:${shipmentId}`,
         accountId: billToAccountId,
         eventType: 'shipment-invoice',
         amount: -1 * cost,

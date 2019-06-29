@@ -41,6 +41,7 @@ async function init() {
 
     server.route(require('./root'));
 
+    server.route(require('./accounts/getAccountHandler'));
     server.route(require('./accounts/events/listEvents'));
     server.route(require('./accounts/listAccountsHandler'));
     server.route(require('./accounts/events/payment/paymentHandler'));
