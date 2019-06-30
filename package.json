@@ -30,6 +30,7 @@
     "shortid": "^2.2.14"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.0.1",
     "chance": "^1.0.18",
     "eslint": "^5.16.0",
     "jasmine-fail-fast": "^2.0.0",
@@ -38,6 +39,7 @@
     "node-fetch": "^2.5.0"
   },
   "jest": {
-    "clearMocks": true
+    "clearMocks": true,
+    "preset": "@shelf/jest-mongodb"
   }
 }
