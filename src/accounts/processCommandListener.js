@@ -19,7 +19,7 @@ async function eachMessage({ message }) {
         .collection('account_events')
         .findOne({_id});
 
-    if (existing && existing.timestamp != timestamp) {
+    if (existing && existing.timestamp <= timestamp) {
         console.log('dropping duplicate command', command);
         return;
     }
