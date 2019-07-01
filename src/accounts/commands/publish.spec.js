@@ -1,2 +1,2 @@
 
-describe.todo('publish account command');
+it.todo('publish account command');

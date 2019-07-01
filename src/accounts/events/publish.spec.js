@@ -1,2 +1,2 @@
 
-describe.todo('Publish event');
+it.todo('Publish event');

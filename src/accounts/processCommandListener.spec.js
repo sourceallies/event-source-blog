@@ -1,2 +1,2 @@
 
-describe.todo('Process account command');
+it.todo('Process account command');
