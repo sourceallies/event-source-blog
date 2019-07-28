@@ -19,13 +19,13 @@ Suppose your team has been asked to work with *Great Plains Trucking* to help au
 
 **TODO: continue narritive**
 
-The above naritive outlines a popular project in software development. In this project, software is being used to replicate and codify a business process. Developers familiar with [Domain driven Design]() will quickly identify the business entity of *Shipment*. Each shipment would have several fields of data. Amy listed many of these fields: the customer, from address, destination, weight, truck as well as some sort of "status".
+The above naritive outlines a common project in software development. In this project, software is being used to replicate and codify a business process. Developers familiar with [Domain driven Design]() will quickly identify the business entity of *Shipment*. Each shipment would have several fields of data. Amy listed many of these fields: the customer, from address, destination, weight, truck as well as some sort of "status".
 
 Generally, these kind of projects are implemented as a [CRUD] application that manages these business entities. Because this is going to be the system of record for shipments, the team decides to build a REST service to expose the data so that multiple applications can access it. A shipment table can be created in a database and a column added for each field. A get endpoint (/shipments) can be created to list all the shipments. A post endpoint (/shipments) can be built to create a shipment. And finally, a PATCH endpoint (/shipment/{shipmentId}) can be used to modify a shipment.
 
-The above process is streightforward on the surface and many successful applications have been built with the above at its core. However, the design does not speak to the business process Amy laid out. It also does not address several other non-functional requirement that common sense and follow up interviews would suggest:
+The above process is streightforward on the surface and many successful applications have been built with the above at its core. However, the design does not speak to the business process Amy laid out. It also does not address several other non-functional requirements that common sense and follow up interviews would suggest:
 
-1. Events have to happen in a speicific order: Shipments cannot be delivered before they are shipped, etc.
+1. Events have to happen in a specific order: Shipments cannot be delivered before they are shipped, etc.
 2. Shipments can be reassigned to other trucks.
 3. The customer account should not be debited until the shipment is delivered and not charged twice.
 4. Some fields are required (e.x. truck) but not until a certain point in the process, before that they are unknown.
@@ -34,4 +34,4 @@ The above process is streightforward on the surface and many successful applicat
 
 Any one of the above can be implemented as a conditional check when a shipment is modified. However, these start to compound in complexity. Validation becomes complicated as some fields are only required in certain statuses, while others are required in other statuses. Deltas have to be calcuated to determine if a shipment is moving from one status to another to decide if a side effect needs to happen (i.e debiting an account). This forces the concerns of all the business processes together into a monolithic patch endpoint and validator. Over time, as requirements evolve and teams change, it will be come ever harder to understand and test the process.
 
-In this blog we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time.
+In this blog we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time. This is a change in mindset from storing the "state" of an entity to storing the "transitions" an entity undergoes as business activities take place.
