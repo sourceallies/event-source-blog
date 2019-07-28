@@ -2,7 +2,7 @@
 # Event Store
 
 One of the key features of using an event sourced strategy for data storage is the ease by which history can be reconstructed.
-This could e done by scanning through the queue and filtering out the events for a given shipment, but this wouldn't be pratical.
+This could be done by scanning through the queue and filtering out the events for a given shipment, but this wouldn't be pratical.
 Instead, we want to store each event into some sort of database.
 For our example application we are using MongoDB because it is a noSQL database that is easy to run locally.
 
