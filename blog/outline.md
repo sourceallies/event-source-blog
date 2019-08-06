@@ -11,19 +11,19 @@
 1. Description of terms
     - Event Sourcing
     - CQRS
-2. High-level architecture overview
+2. High-level architecture overview (Paul R)
     1. emphasize that this approach uses off-the-shelf components (**not** specialized tools)
 3. Start diving into the implementation
-    1. Shipment handler
+    1. Shipment handler (Ben G)
         - data coming in can be "bad" (repeat requests, invalid data per schema, etc.)
         - cannot both save data and broadcast events because of durability (atomic operation)
         - talk about queue implementation (need for partitioning and key)
-    2. Shipment reducer
+    2. Shipment reducer (Ben P)
         - single-threaded in order to enforce data consistency + order of shipment events
         - Produces events as output + updates event store (data store? db? which term do we want to use?)
         - Safe to mutate multiple things because failure will cause the message to be reprocessed.
         - Discuss the need for an aggregate (can't rollup on the fly, need to search, need to ensure valid transitions)
-    3. Cross-domain listener (Shipment -> Accounting)
+    3. Cross-domain listener (Shipment -> Accounting) (Aabristi)
         - In a normal organization, handling shipment logistics and accounting/billing would be done by different teams
         - This could go on the shipment side or the accounting side
             - On the shipment side it makes logistics dependent on accounting. Shipments "push" a command to the accounting system
