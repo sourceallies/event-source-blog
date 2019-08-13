@@ -1,0 +1,14 @@
+Admittedly, the architecture of an event sourced system is more complicated than a state mutation based system. This complexity stems from the need to enforce a correct order of business events. In our shipping use case, we must enforce that a shipment cannot be delivered before it is shipped and cannot be shipped until it is assigned to a truck. We also cannot allow a shipment to be delivered multiple times.
+
+In a state mutation system, because a single record is being modified, optimistic concurrency control or pessimistic locking can ensure that a request cannot process an event while another request is in flight. Beyond this constraint, our system does not require any specialized software, servers or frameworks. An event sourced system can be built as a familiar REST API with the same web frameworks the team is comfortable with and backed by the same datastore technologies as traditional systems.
+
+Our stack consists of the following major components:
+
+- Any application server. We are using [NodeJS](https://nodejs.org/en/).
+- A web framework. We are using [Hapi](https://hapi.dev), however any library that easily allows the parsing and validation of JSON payloads will work (Spring, ASP.NET, etc).
+- Somewhere to store the data. We are using [MongoDB](https://www.mongodb.com). Any SQL or no-sql database will work. Note that if a relational database is used, a common query pattern is to get all events tied to a specific entity id regardless of type.
+- We need a peristant queue. This is the one component that may not be present in exising solutions. Like the other components there are many options. The only requirement is that the queueing system must support [partitioning of messages](https://activemq.apache.org/how-do-message-groups-compare-to-selectors). Utilizing this feature ensures that two messages that are part of the same "group" or "partition" will not be processed at the same time by different consumers and will be processed in the order they were received. Essentially, they force that for a given key, processing is single-threaded. While we are using [Kafka](https://kafka.js.org), [ActiveMQ](https://activemq.apache.org/message-groups.html) and [Kenisis](https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html#shard) also support this feature.
+
+Within our application we will have several handlers responsible for receiving HTTP requests as well as several listeners that receieve messages from queues. Let us look at these various components and explore how they ensure business rule integrety while maintaining a clear separation of concerns.
+
+<img src='dataFlowDiagram.svg' />
