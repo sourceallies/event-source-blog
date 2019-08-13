@@ -11,7 +11,7 @@
 1. Description of terms
     - Event Sourcing
     - CQRS
-2. High-level architecture overview (Paul R)
+2. High-level architecture overview
     1. emphasize that this approach uses off-the-shelf components (**not** specialized tools)
 3. Start diving into the implementation
     1. Shipment handler (Ben G)
@@ -28,7 +28,7 @@
         - This could go on the shipment side or the accounting side
             - On the shipment side it makes logistics dependent on accounting. Shipments "push" a command to the accounting system
             - On the accounting side it make accounting depend on logistics. Accounting listens to shipments and reacts as an interested party
-    4. Accounting handler
+    4. Accounting handler (Paul R)
         - validates command against schema
         - sends a command into the accounting-command topic
     5. Accounting command listener
