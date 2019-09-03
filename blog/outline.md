@@ -31,10 +31,10 @@
     4. Accounting handler (Paul R)
         - validates command against schema
         - sends a command into the accounting-command topic
-    5. Accounting command listener
+    5. Accounting command listener (Paul R)
         - stores transactions
         - single-threaded to make sure that duplicate transactions are not created
-    6. Account reducer
+    6. Account reducer (Paul R)
         - updates a snapshot of the account with a balance as transaction events are received
         - single threaded to make sure that transactions are not double counted or missed
     7. List shipment handler
