@@ -14,7 +14,7 @@
 2. High-level architecture overview
     1. emphasize that this approach uses off-the-shelf components (**not** specialized tools)
 3. Start diving into the implementation
-    1. Shipment handler (Ben G)
+    1. Shipment handler (Done)
         - data coming in can be "bad" (repeat requests, invalid data per schema, etc.)
         - cannot both save data and broadcast events because of durability (atomic operation)
         - talk about queue implementation (need for partitioning and key)
@@ -42,14 +42,14 @@
 
 # Conclusion (What is the message?)
 1. Not the solution to all problems
-    1. What is it good for / pros
+    1. What is it good for / pros (Paul R)
         1. isolating different parts of a business process
         2. isolating different parts of the system
         3. Can use familiar technologies and libraries
         3. easier to change business rules over time
         4. support rich auditing/analytics (keeping all events)
         5. handling heavy regulitory/compliance requirements (approvals, SLAs etc)
-    2. What is it bad for / cons
+    2. What is it bad for / cons (Paul R)
         2. More complicated to reason about
         3. Not all changes are instance (eventual consistency). Time constrained my not be a good fit
         4. "edit" based workflows where a user can arbitrarly update many fields at his/her discression (bad for updating a profile maybe)
