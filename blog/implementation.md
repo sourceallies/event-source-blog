@@ -42,3 +42,19 @@ These statements are specifically ordered to ensure that the shipment reducer ca
 - The `publishEvent` function publishes the event to the event queue. Downward components of the system will receive the event after it's published. To recover from failure, the shipment reducer only needs to re-update the shipment state with the most recently published event.
 
 - The `saveShipment` function saves the shipment state to the data store. At this point the command has been processed in its entirety.
+
+##Cross-domain Listener
+
+While working on the project, team has understood the complexity of the workflow as in the normal organization the shipment logistic and accounting logisitic would be
+handled by different department. To resolve this issue, system needs to introduce an command to another department for the further process. To avoid double billing a customer cross-domain listener is added to system.
+
+For real life implementation, cross domain listener can be added on either side of the system: account or shipment. 
+
+- In this example delivery invoice listener is added to the system as a cross domain listener. 
+To setup cross domain listener in shipment department, listener needs to listen to shipment event queue and process the account command.
+When the event occurs, shipment department will receive the event, validates, processes, saves the event, and adds the shiptment events in the queue. Then job of delivery invoice listener is to listen to events in queue 
+and send command to account handler with `shipmentId`  when shipment event has `Delivered` status. This way account department will process to charge the specific account only for delivered shipment.
+
+- To set up cross domain listener in account department, listener needs to listen to the both shipment command and account command when event occurs.
+When the event occurs, account department will receive the event, validates, processes,sends command to the shipment department for the given account.
+
