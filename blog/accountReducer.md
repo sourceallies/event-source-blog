@@ -1,0 +1,5 @@
+## Account reducer
+
+Having a list of transactions is a good source of truth for an account. In order to get the balance of an account we can simply sum up all of the transactions tied to that account. This works, but isn't very pratical. As the number of transactions grows over time, this can become a slower and slower operation. It is also difficult to find all of the accounts that have a certain balance (To send reminders for example). We can solve this problems by creating an aggregate record that represents the current state of an Account just as we did with Shipments.
+
+The account event reducer is responsible for listening to account related events, loading the account if it exists and updating the balance. The challenge is finding a way to prevent double counting an event if we fail to acknowledge the message. The reducer uses a high water mark to track the timestamp of the last event it has applied to an account on the account. If the lastEventTimestamp is greater than or equal to the timestamp of the event we just received, then we know we have already added the amount to the account and can ignore the message.
