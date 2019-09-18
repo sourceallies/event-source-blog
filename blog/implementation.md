@@ -45,7 +45,7 @@ These statements are specifically ordered to ensure that the shipment reducer ca
 
 ##Cross-domain Listener
 
-While working on the project, team realized in the normal organization the shipment logistic and accounting logistic would be handled by different department. To resolve this issue, system needs to introduce an command to another department for the further process. To avoid double billing a customer cross-domain listener is added to system.
+While working on the project, team realized in a normal organization the shipment logistic and accounting would be handled by different departments. To resolve this issue, system needs to introduce a command to another department for the further process. To avoid double billing a customer, a cross-domain listener is added to system.
 
 For real life implementation, cross domain listener can be added on either side of the system: account or shipment. 
 
