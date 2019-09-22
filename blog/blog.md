@@ -1,45 +1,45 @@
 
-# Outline
+## Outline
 
-1. Intro (What is it?)
+1. [Intro (What is it?)](#Introduction)
     1. business explanation (Hypothetical business case)
     2. the problem + typical mindset
     3. a different way of thinking about the problem wrap up intro with a change of thought: "rather than storing state, if we stored activities, then...x, y, z"
 2. Body (How was it implemented?)
-    1. Description of terms
+    1. [Description of terms](#Description-of-Terms)
         - Event Sourcing
         - CQRS
-    2. High-level architecture overview
+    2. [High-level architecture overview](#Architecture)
         1. emphasize that this approach uses off-the-shelf components (**not** specialized tools)
-    3. Start diving into the implementation
-        1. Shipment handler (Done)
+    3. [Start diving into the implementation](#Implementation)
+        1. [Shipment handler](#Shipment-Handler)
             - data coming in can be "bad" (repeat requests, invalid data per schema, etc.)
             - cannot both save data and broadcast events because of durability (atomic operation)
             - talk about queue implementation (need for partitioning and key)
-        2. Shipment reducer (Ben P)
+        2. [Shipment reducer](#Shipment-Reducer)
             - single-threaded in order to enforce data consistency + order of shipment events
             - Produces events as output + updates event store (data store? db? which term do we want to use?)
             - Safe to mutate multiple things because failure will cause the message to be reprocessed.
             - Discuss the need for an aggregate (can't rollup on the fly, need to search, need to ensure valid transitions)
-        3. Cross-domain listener (Shipment -> Accounting) (Aabristi)
+        3. [Cross-domain listener](#Cross-domain-listener) (Shipment -> Accounting) (Aabristi)
             - In a normal organization, handling shipment logistics and accounting/billing would be done by different teams
             - This could go on the shipment side or the accounting side
                 - On the shipment side it makes logistics dependent on accounting.
                     Shipments "push" a command to the accounting system
                 - On the accounting side it make accounting depend on logistics.
                     Accounting listens to shipments and reacts as an interested party
-        4. Accounting handler (Paul R)
+        4. [Accounting handler](#Accounting-Payment-Handler)
             - validates command against schema
             - sends a command into the accounting-command topic
-        5. Accounting command listener (Paul R)
+        5. [Accounting command listener](#Accounting-Command-Listener)
             - stores transactions
             - single-threaded to make sure that duplicate transactions are not created
-        6. Account reducer (Paul R)
+        6. [Account reducer](#Account-Reducer)
             - updates a snapshot of the account with a balance as transaction events are received
             - single threaded to make sure that transactions are not double counted or missed
         7. List shipment handler
             - Illuistrate the need to have aggregate roots
-3. Conclusion (What is the message?)
+3. [Conclusion](#Conclusion)
     1. Not the solution to all problems
         1. What is it good for / pros (Paul R)
             1. isolating different parts of a business process
@@ -117,6 +117,8 @@ Validation becomes complicated as some fields are only required in certain statu
 Deltas have to be calcuated to determine if a shipment is moving from one status to another to decide if a side effect needs to happen (i.e debiting an account). This forces the concerns of all the business processes together into a monolithic patch endpoint and validator.
 Over time, as requirements evolve and teams change, it will be come ever harder to understand and test the process.
 
+### Description of Terms
+
 In this blog we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time.
 This is a change in mindset from storing the "state" of an entity to storing the "transitions" an entity undergoes as business activities take place.What is "event sourcing" anyway? For the purposes of this explanation, we consider "event sourcing" to refer to a persistance strategy where individual _events_ are stored as the primary system of record.
 The current state of an entity (i.e.
@@ -133,7 +135,11 @@ This can be compared to the real life example of interacting with a government a
 If someone wants to make a modification to their home, they do not call the zoning board and "create a building permit". Rather, they submit a form that specifies the requred and optional information.
 This form may be considered a "building permit request". The city then takes this form and based on various rules creates a "building permit". This pattern fits well within a RESTful URL scheme.
 Each type of commmand has its own URL pattern as a sub-resource of the entity that is being affected and can be submitted with a POST.
-The current state of the entity (derived from the events) can be fetched with a GET request along with the collection of events.Admittedly, the architecture of an event sourced system is more complicated than a state mutation based system.
+The current state of the entity (derived from the events) can be fetched with a GET request along with the collection of events.
+
+### Architecture
+
+Admittedly, the architecture of an event sourced system is more complicated than a state mutation based system.
 This complexity stems from the need to enforce a correct order of business events.
 In our shipping use case, we must enforce that a shipment cannot be delivered before it is shipped and cannot be shipped until it is assigned to a truck.
 We also cannot allow a shipment to be delivered multiple times.
@@ -163,9 +169,9 @@ Let us look at these various components and explore how they ensure business rul
 
 <img src='dataFlowDiagram.svg' />
 
-# Implementation
+### Implementation
 
-## Shipment Handler
+#### Shipment Handler
 
 A Hapi handler is created for each type of command that can be submitted:  Submit, Assign, Ship and Deliver.
 The handler cannot atomically validate, persist and broadcast the command for other consumers, so the handler simply validates the structure of the command and publishes it to a queue.
@@ -173,7 +179,7 @@ This way we can give a successful response to the client and fully process the c
 Partitioning is needed to guarantee that two events for the same shipment are not being processed at the same time.
 We use the shipmentId as our partition key.
 
-## Shipment Reducer
+#### Shipment Reducer
 
 The shipment reducer listens for commands published to the command queue.
 Like all reducers in the system, it performs two primary tasks:
@@ -234,7 +240,7 @@ To recover from failure, the shipment reducer only needs to re-update the shipme
 - The `saveShipment` function saves the shipment state to the data store.
 At this point the command has been processed in its entirety.
 
-## Cross-domain Listener
+#### Cross-domain Listener
 
 While working on the project, team realized in a normal organization the shipment logistic and accounting would be handled by different departments.
 To resolve this issue, system needs to introduce a command to another department for the further process.
@@ -250,18 +256,20 @@ This way account department will process to charge the specific account only for
 
 - To set up cross domain listener in account department, listener needs to listen to the both shipment command and account command when event occurs.When the event occurs, account department will receive the event, validates, processes,sends command to the shipment department for the given account.
 
-
-## Accounting Payment Handler
+#### Accounting Payment Handler
 
 Users will need a way to settle their accounts.
 To suport this we create a Hapi [payment handler]at the URL /accounts/{accountId}/commands/payment.
 Just as with shipments, this handler is responsible for validating the stucture of a payment and then sending the command to a queue (account-commands) to be processed by the command listener.## Accounting Command Listener
 
+### Accounting Command Listener
+
 As with shipments, there is a listener responsible for processing all of the account commands.
 This listener is responsible for storing the accounting command as an accounting event (aka "transaction"). It is important that we do not double-charge or double-credit an account.
 We ensure this by having the publisher of a command assign a unique `_id` field to each accounting command.
 This listener then uses this field to de-duplicate commands to make sure that we do not process the same commad twice.
-## Account reducer
+
+#### Account Reducer
 
 Having a list of transactions is a good source of truth for an account.
 In order to get the balance of an account we can simply sum up all of the transactions tied to that account.
