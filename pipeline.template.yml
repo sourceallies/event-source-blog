@@ -44,6 +44,7 @@ Resources:
     DependsOn:
       - PipelineRole
     Properties:
+      Name: !Sub ${AWS::StackName}-build
       ServiceRole: !GetAtt PipelineRole.Arn
       Source:
         Type: CODEPIPELINE
