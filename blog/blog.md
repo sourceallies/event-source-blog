@@ -173,11 +173,12 @@ Let us look at these various components and explore how they ensure business rul
 
 #### Shipment Handler
 
-A Hapi handler is created for each type of command that can be submitted:  Submit, Assign, Ship and Deliver.
-The handler cannot atomically validate, persist and broadcast the command for other consumers, so the handler simply validates the structure of the command and publishes it to a queue.
-This way we can give a successful response to the client and fully process the command later, relying on the recoverability of the queue to ensure messages are processed safely and in order.
-Partitioning is needed to guarantee that two events for the same shipment are not being processed at the same time.
-We use the shipmentId as our partition key.
+A Hapi handler is created for each shipment command: Submit, Assign, Ship and Deliver.
+A handler cannot atomically validate, persist, and broadcast the command for other consumers, so the handler simply validates the structure of the command and publishes it to the command queue.
+The handler then provides a successful response to the client, indicating that the message was received.
+The recoverability of the queue ensures the command messages will be processed safely and in-order.
+However, partitioning is needed to guarantee that two events for the same shipment are not being processed at the same time.
+We use the shipment ID as our partition key.
 
 #### Shipment Reducer
 
@@ -259,10 +260,11 @@ This way account department will process to charge the specific account only for
 #### Accounting Payment Handler
 
 Users will need a way to settle their accounts.
-To suport this we create a Hapi [payment handler]at the URL /accounts/{accountId}/commands/payment.
-Just as with shipments, this handler is responsible for validating the stucture of a payment and then sending the command to a queue (account-commands) to be processed by the command listener.## Accounting Command Listener
+There is a Hapi payment handler that allows clients to post payments.
+Similar to the shipment handlers, the payment handler is responsible for validating the stucture of a payment request and acknowledging receipt to the client.
+Valid commands are published to the account command queue for further processing.
 
-### Accounting Command Listener
+#### Accounting Command Listener
 
 As with shipments, there is a listener responsible for processing all of the account commands.
 This listener is responsible for storing the accounting command as an accounting event (aka "transaction"). It is important that we do not double-charge or double-credit an account.
