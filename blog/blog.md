@@ -64,7 +64,7 @@ Suppose your team has been asked to work with *Great Plains Trucking* to help au
 Managing shipments by hand via emails and spreadsheets is becoming too much.
 You meet with Amy, the chief operating officer:
 
-> "Let me start with an overview of our business process.", Amy begins, "Typically, a customer will call customer service with a shipment. We take down their information and give them the cost.The representative then sends an email to dispatch.
+> "Let me start with an overview of our business process.", Amy begins, "Typically, a customer will call customer service with a shipment. We take down their information and give them the cost. The representative then sends an email to dispatch.
 
 > Dispatch finds a truck that is available to pick up the shipment and adds the shipment to a shared spreadsheet of trucks to mark that truck as occupied. Dispatch calls the driver and lets them know the pickup address.
 
