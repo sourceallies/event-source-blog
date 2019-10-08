@@ -187,11 +187,10 @@ Like all reducers in the system, it performs two primary tasks:
 1. Make the state changes prescribed by each command received on the command queue
 2. Publish an event upon successfully processing a command
 
-The shipment reducer publishes events to the shipment event queue after successfully processing a shipment command.
 Other components of the system can subscribe to the shipment event queue to perform other tasks, such as account processing.
 For example, a "Deliver" command requests that a shipment be moved from the shipped state to the delivered state.
 The shipment reducer performs the necessary work and publishes a "Delivered" event.
-The account prcessing system can then use this event to debit an account.
+The account processing system can then use this event to debit an account.
 
 The shipment reducer saves the shipment events and the state of each shipment to the data store.
 Although the current state of a shipment can always be rehydrated by reprocessing all previous events, the shipment reducer often needs to check that a command is valid for the current shipment state.
@@ -200,18 +199,18 @@ Saving the current state of a shipment also improves the performance of external
 
 When processing commands, the shipment reducer needs to ensure:
 
-1. Commands are processed in-order.
+1. Commands are processed in order.
 2. Commands do not generate illegal states.
 
 Commands have already been structurally validated by the shipment handler, so the above validation is more concerned with the semantics of a command.
 In-order processing is greatly simplified by the single-threaded execution of the handler.
-However, this alone does not guarantee commands are processed in-order.
+However, this alone does not guarantee commands are processed in order.
 Extraneous circumstances such as network errors can cause command duplication or redelivery.
 Accordingly, the reducer saves the timestamp of the last command processed for a shipment and rejects any commands with an older timestamp.
 
 The shipment reducer will reject any commands that would generate illegal state transitions.
 Knowing which commands to reject is part of the core business logic.
-For example, an "Assign" command cannot be applied on top of a shipment that's already in the "Shipped" state.
+For example, an "Assign" command cannot be applied on top of a shipment that is already in the "Shipped" state.
 If this were to occur, the shipment reducer would not update the shipment state or publish an event.
 
 The core behavior of the shipment reducer can be found in these four lines within `processCommandListener.js`:
@@ -275,11 +274,11 @@ Having a list of transactions is a good source of truth for an account.
 In order to get the balance of an account we can simply sum up all of the transactions tied to that account.
 This works, but isn't very pratical.
 As the number of transactions grows over time, this can become a slower and slower operation.
-It is also difficult to find all of the accounts that have a certain balance (To send reminders for example). We can solve this problems by creating an aggregate record that represents the current state of an Account just as we did with Shipments.
+It is also difficult to find all of the accounts that have a certain balance (to send reminders for example). We can solve these problems by creating an aggregate record that represents the current state of an Account just as we did with Shipments.
 
-The account event reducer is responsible for listening to account related events, loading the account if it exists and updating the balance.
+The account event reducer is responsible for listening to account-related events, loading the account if it exists and updating the balance.
 The challenge is finding a way to prevent double counting an event if we fail to acknowledge the message.
-The reducer uses a high water mark to track the timestamp of the last event it has applied to an account on the account.
+The reducer uses a high water mark to track the timestamp of the last event it has applied to an account.
 If the lastEventTimestamp is greater than or equal to the timestamp of the event we just received, then we know we have already added the amount to the account and can ignore the message.
 
 ## Conclusion
