@@ -88,7 +88,7 @@ In this project, the software is being used to replicate and codify a business p
 Developers familiar with [Domain driven Design]() will quickly identify the business entity of *Shipment*. Each shipment would have several fields of data.
 Amy listed many of these fields: the customer, from address, destination, weight, truck, as well as some sort of "status."
 
-Generally, these kinds of projects is implemented as an [CRUD] application that manages these business entities.
+Generally, these kinds of projects are implemented as [CRUD] applications that manage these business entities.
 Because this is going to be the system of record for shipments, the team decides to build a REST service to expose the data so that multiple applications can access it.
 A shipment table can be created in a database and a column added for each field.
 A get endpoint (/shipments) can be created to list all the shipments.
