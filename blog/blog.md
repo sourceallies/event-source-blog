@@ -151,7 +151,7 @@ In a state mutation system, because a single record is being modified, optimisti
 Beyond this constraint, our system does not require any specialized software, servers or frameworks.
 An event sourced system can be built as a familiar REST API with the same web frameworks the team is comfortable with and backed by the same datastore technologies as traditional systems.
 
-We have created a reference implementation of the above architecture and made it [available on github](https://github.com/sourceallies/event-source-blog).
+We have created a reference implementation of the above architecture and made it [available on GitHub](https://github.com/sourceallies/event-source-blog).
 We have choosen implementations of the components that would be available to the widest audiance of developers.
 Depending on your deployment environment (On-Premis or one of the Clouds), you may want to choose different tools.
 
