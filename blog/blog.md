@@ -112,21 +112,24 @@ Deltas have to be calculated to determine if a shipment is moving from one statu
 
 ### Description of Terms
 
-In this blog we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time.
-This is a change in mindset from storing the "state" of an entity to storing the "transitions" an entity undergoes as business activities take place.What is "event sourcing" anyway? For the purposes of this explanation, we consider "event sourcing" to refer to a persistance strategy where individual _events_ are stored as the primary system of record.
-The current state of an entity (i.e.
-answer the question of what value a property currently has) is _sourced_ from those events by aggregating them into a whole.
+In this blog, we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time.
+This is a change in mindset from storing the "state" of an entity to storing the "transitions" an entity undergoes as business activities take place.
+ For the purposes of this explanation, we use the term "event sourcing" to refer to this persistance strategy where individual _events_ are stored as the primary system of record.
+The current state of an entity is _sourced_ from those events by aggregating them into a whole.
 This is similar to how a data warehouse would store individual fact records and present an average by dividing the sum of a numerator by the sum of a denominator.
 
-We refer to the traditional design of transactional systems that we are most familiar with as "state mutation". In these systems a user activity is stored by loading _state_ and then _mutating_ that state before saving it back into the database.
+We refer to the traditional design of transactional systems that we are most familiar with as "state mutation".
+In these systems a user activity is stored by loading _state_ and then _mutating_ that state before saving it back into the database.
 Sometimes these systems may also store an audit trail, however this audit is derived from the delta of the _state_.
 
 Command Query Response Segregation (CQRS) refers to an API pattern.
 In a state mutation system, an API will typically convey the type of mutation to perform (e.x.
 DELETE a record, update a field, create a record, etc.). In a CQRS system, the API instead specifies *commands* that can be submitted by the client and *queries* that can be requested.
 This can be compared to the real life example of interacting with a government agency.
-If someone wants to make a modification to their home, they do not call the zoning board and "create a building permit". Rather, they submit a form that specifies the requred and optional information.
-This form may be considered a "building permit request". The city then takes this form and based on various rules creates a "building permit". This pattern fits well within a RESTful URL scheme.
+If someone wants to make a modification to their home, they do not call the zoning board and "create a building permit".
+Rather, they submit a form that specifies the requred and optional information.
+This form may be considered a "building permit request". The city then takes this form and based on various rules creates a "building permit".
+This pattern still fits well within a RESTful URL scheme:
 Each type of commmand has its own URL pattern as a sub-resource of the entity that is being affected and can be submitted with a POST.
 The current state of the entity (derived from the events) can be fetched with a GET request along with the collection of events.
 
@@ -140,6 +143,10 @@ We also cannot allow a shipment to be delivered multiple times.
 In a state mutation system, because a single record is being modified, optimistic concurrency control or pessimistic locking can ensure that a request cannot process an event while another request is in flight.
 Beyond this constraint, our system does not require any specialized software, servers or frameworks.
 An event sourced system can be built as a familiar REST API with the same web frameworks the team is comfortable with and backed by the same datastore technologies as traditional systems.
+
+We have created a reference implementation of the above architecture and made it [available on GitHub](https://github.com/sourceallies/event-source-blog).
+We have choosen implementations of the components that would be available to the widest audiance of developers.
+Depending on your deployment environment (On-Premis or one of the Clouds), you may want to choose different tools.
 
 Our stack consists of the following major components:
 
@@ -282,19 +289,22 @@ The first, and probably greatest, benefit of an event sourced system is isolatio
 It isolates different business processes from one another.
 A change to the rules for accepting a shipment do not affect the rules for delivering a shipment or paying an account.
 This isolation is also reflected in the code.
-A traditional REST based state mutation system would need to add more rules to the same handlers to determine who can save a record (depends on the state) and what makes a record valid (depends on where it is in the process). This makes it hard to reason about the effects that chaning one process has on the behavior of others.
-In our system, each handler that is responsible for validating the structure and security of one step in the process is isolated and independent of the others.
+A traditional REST based state mutation system would need to add more rules to the same handlers to determine who can save a record (depends on the state) and what makes a record valid (depends on where it is in the process).
+This makes it hard to reason about the effects that changing one process has on the behavior of others.
+In our system, each handler is responsible for validating the structure and security of one step in the process and is isolated and independent of the others.
 
 While there are libraries and frameworks specific to event sourcing, they are not needed to implement this pattern.
-Our application uses well tested and familiar frameworks and tools (NodeJS, Hapi, MongoDB). The only specific requirement is the ability to queue messages and procesess them synchronously within each entity.
+Our application uses well tested and familiar frameworks and tools (NodeJS, Hapi, MongoDB).
+The only specific requirement is the ability to queue messages and procesess them synchronously within each entity.
 Because of this, event sourcing can be leveraged within existing teams and applications as appropriate.
 
 Most applications, sooner or later, will require some level of auditing and history tracking.
-Often, this is bolted on later in the form of a database trigger or some audit table that is written to as the application updates data.
-These solutions often cause the main system to become more complicated as they are shoehorned into an architecture that was not initially designed for it.
+Often, this is bolted on later in the form of database triggers or some audit tables that are written to as the application updates data.
+These solutions often cause the main system to become more complicated as they are shoe-horned into an architecture that was not initially designed for them.
 They also suffer from lack of context: an audit table can track that a user changed a value from "27" to "20" on a particular date, but cannot track why that value changed (e.x.
-was a payment made, or a refund issued?). Event sourcing naturally tracks these events as the source of truth and leverages this data as an asset to the wider system rather than a burden.
-This feature is doubly important in systems that have regulatory requirements around auditing like healthcare and financial systems.
+was a payment made, or a refund issued?).
+Event sourcing naturally tracks these events as the source of truth and leverages this data as an asset to the wider system rather than a burden.
+This feature is doubly important in systems that have regulatory requirements around auditing such as healthcare and financial systems.
 
 We are not here to claim that event sourcing is the best architecture for every project.
 In fact, it is probably a poor choice the majority of the time.
@@ -303,10 +313,13 @@ This leads to extra complexity if the application never adds enough business pro
 A system that allows users to modify data without a prescribed process (i.e.
 modifying a user profile) doesn't need event sourcing and there would typically only be one type of event "update X".
 
-State is mutated eventually and not directly.
+Another characteristic is that state is mutated *eventually* and not directly.
 It is possible for clients to submit a command and then query up the state of an entity and not see the command applied yet because it is still being processed.
 It is also possible for a command to be submitted successfully but then be rejected by the command handler because the state of the entity changed while the command was in flight.
 Clients would need the ability to check on the status of a command or be notified when a command is rejected.
-Mitigating these shortcomings can result in additional complexity for both the server and clients.
+Mitigating these shortcomings can result in additional complexity for both the server and clients if visability into these scenerios is needed.
+
+In this blog we hope to give teams another architectural tool, along with an [example implementation](https://github.com/sourceallies/event-source-blog)
+When appropriate, it can help make some of the most complicated applications in the enterprise easier to maintain, change, and reason about.
 
 
