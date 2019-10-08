@@ -105,7 +105,7 @@ It also does not address several other non-functional requirements that common s
 4. Some fields are required (e.x. truck), but not until a certain point in the process, before that, they are unknown.
 5. It is probably important to know when things happened in addition to the current state. When a shipment was shipped vs. delivered, for example.
 
-Anyone of the above can be implemented as a conditional check when a shipment is modified.
+Any of the above can be implemented as a conditional check when a shipment is modified.
 However, these start to compound in complexity.
 Validation becomes complicated as some fields are only required in certain statuses, while others are required in other statuses.
 Deltas have to be calculated to determine if a shipment is moving from one status to another to decide if a side effect needs to happen (i.e., debiting an account). This forces the concerns of all the business processes together into a monolithic patch endpoint and validator. Over time, as requirements evolve and teams change, it will become even harder to understand and test the process.
