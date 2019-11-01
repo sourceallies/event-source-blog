@@ -114,7 +114,7 @@ Deltas have to be calculated to determine if a shipment is moving from one statu
 
 In this blog, we outline a different way of building applications that implement a business process called *event sourcing*. This design can greatly simplify the implementation of a business process as well as make it easier to modify and extend over time.
 This is a change in mindset from storing the "state" of an entity to storing the "transitions" an entity undergoes as business activities take place.
- For the purposes of this explanation, we use the term "event sourcing" to refer to this persistance strategy where individual _events_ are stored as the primary system of record.
+ For the purposes of this explanation, we use the term "event sourcing" to refer to this persistence strategy where individual _events_ are stored as the primary system of record.
 The current state of an entity is _sourced_ from those events by aggregating them into a whole.
 This is similar to how a data warehouse would store individual fact records and present an average by dividing the sum of a numerator by the sum of a denominator.
 
@@ -125,12 +125,12 @@ Sometimes these systems may also store an audit trail, however this audit is der
 Command Query Response Segregation (CQRS) refers to an API pattern.
 In a state mutation system, an API will typically convey the type of mutation to perform (e.x.
 DELETE a record, update a field, create a record, etc.). In a CQRS system, the API instead specifies *commands* that can be submitted by the client and *queries* that can be requested.
-This can be compared to the real life example of interacting with a government agency.
+This can be compared to the real-life example of interacting with a government agency.
 If someone wants to make a modification to their home, they do not call the zoning board and "create a building permit".
-Rather, they submit a form that specifies the requred and optional information.
+Rather, they submit a form that specifies the required and optional information.
 This form may be considered a "building permit request". The city then takes this form and based on various rules creates a "building permit".
 This pattern still fits well within a RESTful URL scheme:
-Each type of commmand has its own URL pattern as a sub-resource of the entity that is being affected and can be submitted with a POST.
+Each type of command has its own URL pattern as a sub-resource of the entity that is being affected and can be submitted with a POST.
 The current state of the entity (derived from the events) can be fetched with a GET request along with the collection of events.
 
 ### Architecture
@@ -145,8 +145,8 @@ Beyond this constraint, our system does not require any specialized software, se
 An event sourced system can be built as a familiar REST API with the same web frameworks the team is comfortable with and backed by the same datastore technologies as traditional systems.
 
 We have created a reference implementation of the above architecture and made it [available on GitHub](https://github.com/sourceallies/event-source-blog).
-We have choosen implementations of the components that would be available to the widest audiance of developers.
-Depending on your deployment environment (On-Premis or one of the Clouds), you may want to choose different tools.
+We have chosen implementations of the components that would be available to the widest audience of developers.
+Depending on your deployment environment (On-Premise or one of the Clouds), you may want to choose different tools.
 
 Our stack consists of the following major components:
 
@@ -157,15 +157,15 @@ We are using [Hapi](https://hapi.dev), however any library that easily allows th
 - Somewhere to store the data.
 We are using [MongoDB](https://www.mongodb.com). Any SQL or no-sql database will work.
 Note that if a relational database is used, a common query pattern is to get all events tied to a specific entity id regardless of type.
-- We need a peristant queue.
-This is the one component that may not be present in exising solutions.
+- We need a persistent queue.
+This is the one component that may not be present in existing solutions.
 Like the other components there are many options.
 The only requirement is that the queueing system must support [partitioning of messages](https://activemq.apache.org/how-do-message-groups-compare-to-selectors). Utilizing this feature ensures that two messages that are part of the same "group" or "partition" will not be processed at the same time by different consumers and will be processed in the order they were received.
 Essentially, they force that for a given key, processing is single-threaded.
 While we are using [Kafka](https://kafka.js.org), [ActiveMQ](https://activemq.apache.org/message-groups.html) and [Kenisis](https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html#shard) also support this feature.
 
-Within our application we will have several handlers responsible for receiving HTTP requests as well as several listeners that receieve messages from queues.
-Let us look at these various components and explore how they ensure business rule integrety while maintaining a clear separation of concerns.
+Within our application we will have several handlers responsible for receiving HTTP requests as well as several listeners that receive messages from queues.
+Let us look at these various components and explore how they ensure business rule integrity while maintaining a clear separation of concerns.
 
 <img src='dataFlowDiagram.svg' />
 
@@ -251,16 +251,16 @@ For real life implementation, cross domain listener can be added on either side 
 - In this example delivery invoice listener is added to the system as a cross domain listener.
 To setup cross domain listener in shipment department, listener needs to listen to shipment event queue and create an account command.
 When the event occurs, shipment department will receive the event, validates, processes, saves the event, and adds the shipment events in the queue.
-Then job of delivery invoice listener is to listen to events in queue and send command to account handler with `shipmentId`  when shipment event has `Delivered` status.
+Then job of delivery invoice listener is to listen to events in queue and send command to account handler with `shipmentId` when shipment event has `Delivered` status.
 This way account department will process to charge the specific account only for delivered shipment.
 
-- To set up cross domain listener in account department, listener needs to listen to the both shipment command and account command when event occurs.When the event occurs, account department will receive the event, validates, processes,sends command to the shipment department for the given account.
+- To set up cross domain listener in account department, listener needs to listen to the both shipment command and account command when event occurs. When the event occurs, account department will receive the event, validates, processes, sends command to the shipment department for the given account.
 
 #### Accounting Payment Handler
 
 Users will need a way to settle their accounts.
 There is a Hapi payment handler that allows clients to post payments.
-Similar to the shipment handlers, the payment handler is responsible for validating the stucture of a payment request and acknowledging receipt to the client.
+Similar to the shipment handlers, the payment handler is responsible for validating the structure of a payment request and acknowledging receipt to the client.
 Valid commands are published to the account command queue for further processing.
 
 #### Accounting Command Listener
@@ -268,20 +268,20 @@ Valid commands are published to the account command queue for further processing
 As with shipments, there is a listener responsible for processing all of the account commands.
 This listener is responsible for storing the accounting command as an accounting event (aka "transaction"). It is important that we do not double-charge or double-credit an account.
 We ensure this by having the publisher of a command assign a unique `_id` field to each accounting command.
-This listener then uses this field to de-duplicate commands to make sure that we do not process the same commad twice.
+This listener then uses this field to de-duplicate commands to make sure that we do not process the same command twice.
 
 #### Account Reducer
 
 Having a list of transactions is a good source of truth for an account.
 In order to get the balance of an account we can simply sum up all of the transactions tied to that account.
-This works, but isn't very pratical.
+This works, but isn't very practical.
 As the number of transactions grows over time, this can become a slower and slower operation.
 It is also difficult to find all of the accounts that have a certain balance (to send reminders for example). We can solve these problems by creating an aggregate record that represents the current state of an Account just as we did with Shipments.
 
 The account event reducer is responsible for listening to account-related events, loading the account if it exists and updating the balance.
 The challenge is finding a way to prevent double counting an event if we fail to acknowledge the message.
 The reducer uses a high water mark to track the timestamp of the last event it has applied to an account.
-If the lastEventTimestamp is greater than or equal to the timestamp of the event we just received, then we know we have already added the amount to the account and can ignore the message.
+If the `lastEventTimestamp` is greater than or equal to the timestamp of the event we just received, then we know we have already added the amount to the account and can ignore the message.
 
 ## Conclusion
 
