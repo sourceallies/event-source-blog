@@ -1,7 +1,7 @@
 
 # Event Source Blog Sample Application
 
-This is the repository for an example application that demonstrates the topics covered in the event sourcing blog post.
+This is the repository for an example application that demonstrates the topics covered in the [event sourcing blog post](https://www.sourceallies.com/2019/11/event-sourcing/).
 
 ## Getting Started
 
