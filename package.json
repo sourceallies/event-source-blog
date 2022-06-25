@@ -36,7 +36,7 @@
     "jasmine-fail-fast": "^2.0.0",
     "jest": "^24.7.1",
     "mockdate": "^2.0.2",
-    "node-fetch": "^2.5.0"
+    "node-fetch": "^2.6.7"
   },
   "jest": {
     "clearMocks": true,
